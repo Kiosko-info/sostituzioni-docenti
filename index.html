@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Sostituzioni - IIS Buccari Marconi</title>
+    <style>
+        :root {
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
+            --accent: #3b82f6; --gold: #fbbf24; --border: #334155;
+            --success: #10b981;
+        }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background: var(--bg); color: var(--text); 
+            margin: 0; padding: 15px; padding-bottom: 90px;
+        }
+        header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--gold); padding-bottom: 15px; }
+        h1 { font-size: 0.8rem; margin: 0; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+        
+        /* Stile Calendario */
+        #dataMobile {
+            background: #2d3a4f;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: inherit;
+            text-align: center;
+            width: 80%;
+            outline: none;
+        }
+
+        .status-bar { 
+            display: flex; justify-content: space-between; font-size: 0.7rem; 
+            background: var(--card); padding: 8px 12px; border-radius: 8px; margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+        th { background: #2d3a4f; color: var(--gold); padding: 12px 8px; font-size: 0.65rem; text-transform: uppercase; text-align: left; }
+        td { padding: 14px 8px; border-bottom: 1px solid var(--border); font-size: 0.85rem; vertical-align: middle; }
+        
+        .ora { font-weight: bold; color: var(--accent); width: 15%; }
+        .docente-assente { color: var(--text); opacity: 0.8; font-size: 0.8rem; }
+        .docente-sostituto { font-weight: bold; color: var(--text); }
+        .classe-aula { color: #94a3b8; font-size: 0.75rem; text-align: right; line-height: 1.2; }
+        
+        .empty { text-align: center; padding: 60px 20px; opacity: 0.5; font-style: italic; }
+        
+        /* Pulsante Condividi */
+        .btn-share {
+            position: fixed; bottom: 20px; right: 20px;
+            background: var(--accent); color: white;
+            border: none; border-radius: 50px;
+            padding: 12px 20px; font-weight: bold; font-size: 0.85rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; z-index: 100;
+        }
+
+        .syncing { color: var(--accent); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>IIS BUCCARI MARCONI</h1>
+        <input type="date" id="dataMobile" onchange="caricaDati()">
+    </header>
+
+    <div class="status-bar">
+        <span id="status">🔄 Avvio...</span>
+        <span id="lastUpdate"></span>
+    </div>
+
+    <table id="tabellaSostituzioni">
+        <thead>
+            <tr>
+                <th>Ora</th>
+                <th>Assente</th>
+                <th>Sostituto</th>
+                <th style="text-align: right;">Classe</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabella">
+            <tr><td colspan="4" class="empty">Seleziona una data per visualizzare...</td></tr>
+        </tbody>
+    </table>
+
+    <button class="btn-share" onclick="condividiApp()">
+        <span>🔗</span> CONDIVIDI
+    </button>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySELfqXg24al4_Cq2GVYgRYHTqVKjSb8JWjpKCcY4YjupYtiepFX5TqMAyjbtU75BO/exec";
+    const PASSWORD_SISTEMA = "buccari2026"; 
+
+    // 1. Controllo Password
+    if (localStorage.getItem("auth_buccari") !== "attivo") {
+        let p = prompt("Password Area Docenti:");
+        if (p === PASSWORD_SISTEMA) {
+            localStorage.setItem("auth_buccari", "attivo");
+        } else {
+            document.body.innerHTML = "<div style='text-align:center;padding:50px;color:white;'><h3>Accesso negato</h3><button onclick='location.reload()'>Riprova</button></div>";
+            throw new Error("Auth fallita");
+        }
+    }
+
+    // 2. Impostazione Data Iniziale (Oggi)
+    const picker = document.getElementById("dataMobile");
+    if (!picker.value) {
+        picker.value = new Date().toISOString().split('T')[0];
+    }
+
+    async function caricaDati() {
+        const status = document.getElementById("status");
+        const dataScelta = new Date(picker.value).setHours(0,0,0,0);
+        
+        status.innerText = "🔄 Sincronizzazione...";
+        status.classList.add("syncing");
+
+        try {
+            const res = await fetch(SCRIPT_URL + "?t=" + Date.now());
+            const elenco = await res.json();
+            
+            const filtrati = elenco.filter(s => {
+                let dCloud;
+                if(s.data.includes("/")) {
+                    const p = s.data.split("/");
+                    dCloud = new Date(p[2], p[1]-1, p[0]).setHours(0,0,0,0);
+                } else {
+                    dCloud = new Date(s.data).setHours(0,0,0,0);
+                }
+                return dCloud === dataScelta;
+            }).sort((a,b) => a.ora.localeCompare(b.ora, undefined, {numeric: true}));
+
+            render(filtrati);
+            
+            status.innerText = "✅ Online";
+            status.classList.remove("syncing");
+            document.getElementById("lastUpdate").innerText = "Agg. " + new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+            
+        } catch (e) {
+            status.innerText = "⚠️ Errore Rete";
+            status.classList.remove("syncing");
+        }
+    }
+
+    function render(dati) {
+        const corpo = document.getElementById("corpoTabella");
+        if (dati.length === 0) {
+            corpo.innerHTML = `<tr><td colspan="4" class="empty">Nessuna sostituzione per questa data.</td></tr>`;
+            return;
+        }
+        corpo.innerHTML = dati.map(s => `
+            <tr>
+                <td class="ora">${s.ora}</td>
+                <td class="docente-assente">${s.assente}</td>
+                <td class="docente-sostituto">${s.sostituto}</td>
+                <td class="classe-aula">${s.classe}<br><small>${s.aula}</small></td>
+            </tr>
+        `).join('');
+    }
+
+    async function condividiApp() {
+        const shareData = {
+            title: 'Sostituzioni Buccari',
+            text: 'Link sostituzioni docenti:',
+            url: window.location.href
+        };
+
+        if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            try { await navigator.share(shareData); } catch (err) {}
+        } else {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                const alertBox = document.createElement("div");
+                alertBox.innerText = "Link copiato! 📋";
+                alertBox.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--success); color:white; padding:10px 20px; border-radius:50px; z-index:1000; font-size:0.8rem;";
+                document.body.appendChild(alertBox);
+                setTimeout(() => alertBox.remove(), 2000);
+            } catch (err) {
+                alert("Link: " + window.location.href);
+            }
+        }
+    }
+
+    // Caricamento iniziale e aggiornamento ogni 60 secondi
+    caricaDati();
+    setInterval(caricaDati, 60000);
+</script>
+</body>
+</html>
