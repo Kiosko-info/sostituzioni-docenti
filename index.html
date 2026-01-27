@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Sostituzioni">
     
-    <link rel="apple-touch-icon" href="logo.png?=1">
-    <link rel="icon" type="image/png" href="logo.png?=1">
+    <link rel="apple-touch-icon" href="logo.png?v=2">
+    <link rel="icon" type="image/png" href="logo.png?v=2">
     
     <title>Sostituzioni - IIS Buccari Marconi</title>
     <style>
@@ -68,6 +68,27 @@
             cursor: pointer; z-index: 100;
         }
 
+        /* Sezione Privacy & Logout */
+        .privacy-footer {
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 0.65rem;
+            color: #64748b;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            line-height: 1.4;
+        }
+        .btn-logout {
+            background: none;
+            border: 1px solid #64748b;
+            color: #64748b;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
         .syncing { color: var(--accent); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
@@ -80,7 +101,7 @@
     </header>
 
     <div class="status-bar">
-        <span id="status">🔄 Avvio...</span>
+        <span id="status">🔄 In attesa...</span>
         <span id="lastUpdate"></span>
     </div>
 
@@ -94,7 +115,7 @@
             </tr>
         </thead>
         <tbody id="corpoTabella">
-            <tr><td colspan="4" class="empty">Caricamento in corso...</td></tr>
+            <tr><td colspan="4" class="empty">Inserire password per caricare i dati...</td></tr>
         </tbody>
     </table>
 
@@ -102,25 +123,41 @@
         <span>🔗</span> CONDIVIDI
     </button>
 
+    <div class="privacy-footer">
+        <p><strong>INFORMATIVA PRIVACY (GDPR)</strong><br>
+        I dati visualizzati sono ad esclusivo uso interno del personale in servizio presso l'IIS Buccari Marconi. 
+        È vietata la diffusione, la pubblicazione o la comunicazione a terzi non autorizzati. 
+        I dati sono limitati alle sole finalità organizzative (Art. 6 GDPR).</p>
+        <button class="btn-logout" onclick="logout()">🔐 Esci dall'Area Docenti</button>
+    </div>
+
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySELfqXg24al4_Cq2GVYgRYHTqVKjSb8JWjpKCcY4YjupYtiepFX5TqMAyjbtU75BO/exec";
     const PASSWORD_SISTEMA = "buccari2026"; 
 
+    // 1. Controllo Password con protezione migliorata
     if (localStorage.getItem("auth_buccari") !== "attivo") {
-        let p = prompt("Password Area Docenti:");
+        let p = prompt("ACCESSO RISERVATO\nInserire la password Area Docenti:");
         if (p === PASSWORD_SISTEMA) {
             localStorage.setItem("auth_buccari", "attivo");
-        } else {
-            document.body.innerHTML = "<div style='text-align:center;padding:50px;color:white;'><h3>Accesso negato</h3><button onclick='location.reload()'>Riprova</button></div>";
+            location.reload();
+        } else if (p !== null) {
+            alert("Password errata. Accesso negato.");
+            document.body.innerHTML = "<div style='text-align:center;padding:50px;color:white;'><h3>Accesso non autorizzato</h3><button onclick='location.reload()'>Riprova</button></div>";
             throw new Error("Auth fallita");
+        } else {
+             document.body.innerHTML = ""; // Se annulla il prompt
+             throw new Error("Cancellato dall'utente");
         }
     }
 
+    // 2. Impostazione Data
     const picker = document.getElementById("dataMobile");
     if (!picker.value) {
         picker.value = new Date().toISOString().split('T')[0];
     }
 
+    // 3. Funzione Caricamento Dati
     async function caricaDati() {
         const status = document.getElementById("status");
         const dataScelta = new Date(picker.value).setHours(0,0,0,0);
@@ -171,29 +208,33 @@
         `).join('');
     }
 
+    // 4. Funzioni Utilità (Share e Logout)
     async function condividiApp() {
         const shareData = {
             title: 'Sostituzioni Buccari',
             text: 'Link sostituzioni docenti:',
             url: window.location.href
         };
-
         if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             try { await navigator.share(shareData); } catch (err) {}
         } else {
             try {
                 await navigator.clipboard.writeText(window.location.href);
-                const alertBox = document.createElement("div");
-                alertBox.innerText = "Link copiato! 📋";
-                alertBox.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--success); color:white; padding:10px 20px; border-radius:50px; z-index:1000; font-size:0.8rem;";
-                document.body.appendChild(alertBox);
-                setTimeout(() => alertBox.remove(), 2000);
+                alert("Link copiato negli appunti! 📋");
             } catch (err) {
                 alert("Link: " + window.location.href);
             }
         }
     }
 
+    function logout() {
+        if(confirm("Vuoi disconnetterti dall'Area Docenti?")) {
+            localStorage.removeItem("auth_buccari");
+            location.reload();
+        }
+    }
+
+    // Avvio e Loop
     caricaDati();
     setInterval(caricaDati, 60000);
 </script>
