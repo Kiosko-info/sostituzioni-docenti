@@ -1,5 +1,5 @@
 // --- CONFIGURAZIONE ---
-const SCRIPT_URL = "INSERISCI_QUI_IL_TUO_URL_APPS_SCRIPT"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxa-dWWpQVxE437Z0ECjvjYZqec57rG38jCP6UGDVz4NDmxLEnFL76F-If0-lCKDxefRw/exec"; 
 const PIN_SEGRETO = "1234"; 
 
 let ultimoContenuto = "";
@@ -295,3 +295,4 @@ function ruotaCircolariMeteo() {
 }
 
 window.onload = init;
+
