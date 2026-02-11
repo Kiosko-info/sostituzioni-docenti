@@ -5,13 +5,12 @@ const PIN_SEGRETO = "1234";
 let ultimoContenuto = "";
 let elencoNews = [], elencoCircolari = [];
 let meteoP1 = "", meteoP2 = "", indiceNews = 0, indiceCirc = 0, modoMeteoAttivo = false;
-let modoVisualizzazione = "oggi"; // "oggi" o "future"
+let modoVisualizzazione = "oggi"; 
 
 function init() {
     checkLogin();
     aggiornaDataOra();
     
-    // Carica preferenza docente
     const savedName = localStorage.getItem("docentePreferito");
     if (savedName) {
         document.getElementById('cercaDocente').value = savedName;
@@ -20,14 +19,34 @@ function init() {
     }
 
     ricaricaDati(); 
-    caricaNewsRss(); 
-    aggiornaMeteo();
+
+    // CARICA NEWS E METEO SOLO SE NON SEI SU MOBILE
+    if (window.innerWidth > 768) {
+        caricaNewsRss(); 
+        aggiornaMeteo();
+        setInterval(ruotaNews, 8000);
+        setInterval(aggiornaMeteo, 1800000);
+        setTimeout(ruotaCircolariMeteo, 5000);
+    }
 
     setInterval(aggiornaDataOra, 1000);
     setInterval(ricaricaDati, 60000);
-    setInterval(ruotaNews, 8000);
-    setInterval(aggiornaMeteo, 1800000);
-    setTimeout(ruotaCircolariMeteo, 5000);
+}
+
+// --- FUNZIONE CHE GENERA L'HTML DI UNA RIGA (Ora centralizzata) ---
+function generaRiga(riga) {
+    let tagHtml = "";
+    if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
+    else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA</span>`;
+
+    return `
+        <div class="table-row row">
+            <div class="data-ora">${riga.ora}°</div>
+            <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
+            <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
+            <div class="data-sostituto">${String(riga.sostituto).toUpperCase()}</div>
+            <div class="data-info">${tagHtml}</div>
+        </div>`;
 }
 
 // --- GESTIONE LOGIN ---
@@ -77,7 +96,7 @@ function filtraPerDocente() {
     righe.forEach(riga => {
         const sostTxt = riga.querySelector('.data-sostituto').innerText.toUpperCase();
         if (input === "" || sostTxt.includes(input)) {
-            riga.style.display = "flex"; 
+            riga.style.display = "grid"; // Grid è necessario per il layout card del tuo CSS
         } else {
             riga.style.display = "none";
         }
@@ -135,7 +154,6 @@ async function ricaricaDati() {
     }
 }
 
-// --- FUNZIONE TOGGLE PER DATE FUTURE (FISARMONICA) ---
 function toggleDate(dateId) {
     const group = document.getElementById(dateId);
     const header = document.getElementById("header-" + dateId);
@@ -151,15 +169,11 @@ function toggleDate(dateId) {
 
 function costruisciTabella(dati) {
     const scroller = document.getElementById('scroller-content');
-    
-    // Ordinamento
     dati.sort((a, b) => a.ora - b.ora);
 
-    // SE SIAMO SU MOBILE, USIAMO LA LOGICA A GRUPPI (FISARMONICA)
+    // MOBILE FISARMONICA (Future)
     if (window.innerWidth <= 768 && modoVisualizzazione === "future") {
         scroller.style.animation = "none";
-        
-        // Raggruppa i dati per data
         const gruppi = {};
         dati.forEach(riga => {
             if (!gruppi[riga.data]) gruppi[riga.data] = [];
@@ -167,68 +181,33 @@ function costruisciTabella(dati) {
         });
 
         let htmlMobile = "";
-        // Per ogni data crea un gruppo
         for (const [data, righe] of Object.entries(gruppi)) {
-            // Crea ID univoco (togliendo spazi e slash)
             const safeId = "group-" + data.replace(/[^a-zA-Z0-9]/g, "");
-            
-            // Intestazione Cliccabile
             htmlMobile += `<div id="header-${safeId}" class="date-divider" onclick="toggleDate('${safeId}')">📅 ${data}</div>`;
-            
-            // Contenitore Righe
             htmlMobile += `<div id="${safeId}" class="day-group">`;
-            
-            righe.forEach(riga => {
-                let tagHtml = "";
-                if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
-                else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA</span>`;
-
-                htmlMobile += `
-                    <div class="table-row row">
-                        <div class="data-ora">${riga.ora}°</div>
-                        <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
-                        <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
-                        <div class="data-sostituto">${String(riga.sostituto).toUpperCase()}</div>
-                        <div class="data-info">${tagHtml}</div>
-                    </div>`;
-            });
-            
-            htmlMobile += `</div>`; // Chiude gruppo
+            righe.forEach(riga => { htmlMobile += generaRiga(riga); });
+            htmlMobile += `</div>`;
         }
-        
         scroller.innerHTML = htmlMobile;
-        return; // Esci, abbiamo finito per il mobile
+        return;
     }
 
-    // --- LOGICA STANDARD (PC / MOBILE OGGI) ---
+    // LOGICA STANDARD
     let html = "";
-    dati.forEach(riga => {
-        let tagHtml = "";
-        if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
-        else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA</span>`;
-
-        html += `
-            <div class="table-row row">
-                <div class="data-ora">${riga.ora}°</div>
-                <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
-                <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
-                <div class="data-sostituto">${String(riga.sostituto).toUpperCase()}</div>
-                <div class="data-info">${tagHtml}</div>
-            </div>`;
-    });
+    dati.forEach(riga => { html += generaRiga(riga); });
 
     if (window.innerWidth <= 768) {
         scroller.innerHTML = html;
         scroller.style.animation = "none";
     } else {
-        const separator = `<div class="table-row" style="height:120px; display:flex; align-items:center; justify-content:center; color:var(--apple-blue); font-weight:800; opacity:0.4; grid-column: 1 / -1; border-bottom:2px dashed var(--apple-blue);">--- RICOMINCIA ELENCO ---</div>`;
+        const separator = `<div class="table-row" style="height:120px; display:flex; align-items:center; justify-content:center; color:var(--accent); font-weight:800; opacity:0.4; grid-column: 1 / -1; border-bottom:2px dashed var(--accent);">--- RICOMINCIA ELENCO ---</div>`;
         scroller.innerHTML = html + separator + html + separator;
         const durata = Math.max(20, dati.length * 5);
         scroller.style.animation = `infiniteScroll ${durata}s linear infinite`;
     }
 }
 
-// METEO E NEWS (INVARIATI)
+// --- FUNZIONI METEO E NEWS (Senza cambiamenti logici, ma attivate solo su PC dall'init) ---
 function getMeteoIcon(code) { const icone = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 48: "🌫️", 51: "🌦️", 61: "🌧️", 63: "🌧️", 71: "🌨️", 80: "🌦️", 95: "⛈️" }; return icone[code] || "☀️"; }
 async function aggiornaMeteo() {
     try {
@@ -266,14 +245,13 @@ function ruotaNews() {
         aN.classList.remove('show');
         setTimeout(() => {
             const n = elencoNews[indiceNews];
-            labelN.innerHTML = `🌍 News <span style="font-size:0.7rem; color:var(--apple-blue); border:1px solid var(--apple-blue); padding:2px 8px; border-radius:6px; margin-left:10px; font-weight:800;">${n.f.toUpperCase()}</span>`;
+            labelN.innerHTML = `🌍 News <span style="font-size:0.7rem; color:var(--accent); border:1px solid var(--accent); padding:2px 8px; border-radius:6px; margin-left:10px; font-weight:800;">${n.f.toUpperCase()}</span>`;
             aN.innerHTML = `<span>${n.t}</span>`;
             aN.classList.add('show');
             indiceNews = (indiceNews + 1) % elencoNews.length;
         }, 1000);
     }
 }
-async function caricaFeed() { elencoCircolari = []; }
 function ruotaCircolariMeteo() {
     const aC = document.getElementById('fadeCircolari');
     const labelC = document.getElementById('labelCircolari');
@@ -295,4 +273,6 @@ function ruotaCircolariMeteo() {
 }
 
 window.onload = init;
+window.onload = init;
+
 
