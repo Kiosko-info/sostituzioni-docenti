@@ -1,12 +1,8 @@
-/* --- FILE style.css COMPLETO - VERSIONE GIUSTIFICATA --- */
-
 :root {
     --bg-dark: #020617;
     --card-bg: rgba(15, 23, 42, 0.75);
     --apple-blue: #38bdf8;
     --sostituto-green: #4ade80;
-    --temp-max: #ff4d4d; 
-    --temp-min: #38bdf8; 
     --border-glass: rgba(255, 255, 255, 0.12);
 }
 
@@ -14,7 +10,6 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    /* background: url('Buccari Onda.jpg') no-repeat center center fixed; */
     background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
     background-size: cover; 
     height: 100vh; 
@@ -24,7 +19,6 @@ body {
     color: #f8fafc; 
     padding: 20px;
     background-color: var(--bg-dark);
-    text-rendering: optimizeLegibility;
 }
 
 /* --- HEADER --- */
@@ -72,20 +66,14 @@ main {
     flex-direction: column;
 }
 
-/* --- GRIGLIA DATI GIUSTIFICATA (5 COLONNE) --- */
+/* --- GRIGLIA GIUSTIFICATA 5 COLONNE --- */
 .table-row { 
     display: grid; 
-    /* Usiamo SOLO frazioni (fr) per distribuire lo spazio matematicamente.
-       0.8fr: Ora (stretta)
-       1fr:   Classe
-       1fr:   Aula
-       3fr:   Sostituto (Largo)
-       1.5fr: Info (Medio)
-    */
+    /* Calcolo matematico spazi: Ora stretta, Sostituto largo */
     grid-template-columns: 0.8fr 1fr 1fr 3fr 1.5fr; 
     width: 100%; 
     align-items: center; 
-    padding: 0 10px; /* Padding laterale ridotto per sfruttare tutto lo spazio */
+    padding: 0 10px;
 }
 
 .table-header-fixed { 
@@ -103,55 +91,25 @@ main {
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
-    /* CENTRAMENTO TOTALE */
     text-align: center;
-    display: flex;             /* Flexbox per centrare perfettamente anche verticalmente */
-    justify-content: center;   /* Centra orizzontalmente */
-    align-items: center;       /* Centra verticalmente */
+    display: flex;             
+    justify-content: center;   
+    align-items: center;       
 }
 
-/* --- Stili Dati Specifici --- */
-.data-ora { 
-    font-weight: bold; 
-    color: var(--apple-blue); 
-    font-size: 1.6rem; 
-}
+/* Stili Dati */
+.data-ora { font-weight: bold; color: var(--apple-blue); font-size: 1.6rem; }
+.data-classe { font-weight: 600; font-size: 1.5rem; }
+.data-aula { opacity: 0.9; font-size: 1.5rem; }
+.data-sostituto { color: var(--sostituto-green); font-weight: 800; font-size: 1.6rem; }
+.data-info { font-size: 1.2rem; }
 
-.data-classe { 
-    font-weight: 600; 
-    font-size: 1.5rem; 
-}
-
-.data-aula { 
-    opacity: 0.9; 
-    font-size: 1.5rem; 
-}
-
-.data-sostituto { 
-    color: var(--sostituto-green); 
-    font-weight: 800; 
-    font-size: 1.6rem; 
-    /* Rimuoviamo allineamenti a sinistra forzati */
-}
-
-.data-info {
-    font-size: 1.2rem;
-}
-
-/* --- TAGS (Badge) --- */
-.tag {
-    font-size: 0.8rem; 
-    padding: 5px 12px; 
-    border-radius: 8px; 
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    white-space: nowrap;
-}
+/* Tags */
+.tag { font-size: 0.8rem; padding: 5px 12px; border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
 .tag-compresenza { color: #000; background: var(--apple-blue); box-shadow: 0 0 8px rgba(56, 189, 248, 0.5); }
 .tag-vigilanza { color: #fff; background: #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.5); }
 
-/* --- SCROLLING --- */
+/* Scrolling */
 #scroll-container { flex: 1; overflow: hidden; position: relative; }
 .scroller { position: absolute; width: 100%; animation: infiniteScroll linear infinite; will-change: transform; }
 @keyframes infiniteScroll { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
@@ -164,11 +122,7 @@ footer { display: grid; grid-template-columns: 1fr 120px; gap: 15px; margin-top:
 .footer-tickers { display: flex; flex-direction: column; gap: 8px; }
 .ticker-row { display: flex; height: 60px; background: var(--card-bg); border-radius: 14px; align-items: center; border: 1px solid var(--border-glass); overflow: hidden; }
 .ticker-label { padding: 0 20px; height: 100%; display: flex; align-items: center; color: white; font-weight: 700; font-size: 0.85rem; min-width: 200px; text-transform: uppercase; justify-content: center; } 
-/* justify-content: center nella label ticker per coerenza */
-
 .fade-container { flex: 1; padding: 0 25px; font-size: 1.25rem; opacity: 0; transition: opacity 1s; display: flex; align-items: center; justify-content: center; gap: 15px; overflow: hidden;}
-/* justify-content: center nel container news */
-
 .show { opacity: 1; }
 
 .meteo-settimana { display: flex; align-items: center; width: 100%; justify-content: space-around; height: 100%; }
@@ -182,9 +136,46 @@ footer { display: grid; grid-template-columns: 1fr 120px; gap: 15px; margin-top:
 .temp-min { color: var(--temp-min); }
 .temp-max { color: var(--temp-max); }
 
-.qr-footer-box { background: white; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; }
-.qr-footer-box img { width: 75px; height: 75px; }
-.qr-footer-box span { color: #000; font-size: 0.55rem; font-weight: 900; margin-top: 2px; }
+/* --- QR CODE --- */
+.qr-footer-box { 
+    background: white; 
+    border-radius: 14px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 5px;
+    
+    /* IMMAGINE QR CODE */
+    background-image: url('qr-code.png'); /* Assicurati che il file si chiami così */
+    background-size: 85%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+/* Nascondiamo le scritte vecchie se c'è il QR */
+.qr-footer-box span { display: none; }
+
+/* --- OVERLAY LOGIN (PROTEZIONE MOBILE) --- */
+#overlay-login {
+    display: none; /* Nascosto di default */
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(2, 6, 23, 0.95);
+    z-index: 9999;
+    justify-content: center; align-items: center; flex-direction: column;
+}
+.login-box {
+    background: #1e293b; padding: 30px; border-radius: 20px;
+    text-align: center; border: 1px solid var(--apple-blue);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+}
+.login-box h2 { margin-bottom: 20px; color: white; text-transform: uppercase; }
+.login-box input {
+    padding: 10px; font-size: 1.2rem; border-radius: 8px; border: none; text-align: center; width: 150px;
+}
+.login-box button {
+    margin-top: 15px; padding: 10px 20px; background: var(--apple-blue);
+    border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%;
+}
 
 /* --- RESPONSIVE MOBILE --- */
 @media screen and (max-width: 768px) {
@@ -196,24 +187,13 @@ footer { display: grid; grid-template-columns: 1fr 120px; gap: 15px; margin-top:
     .scroller { position: static; animation: none !important; }
     
     .table-row { 
-        display: flex; 
-        flex-direction: column; 
-        border-bottom: 1px solid #333; 
-        padding: 15px; 
-        margin-bottom: 10px; 
-        background: rgba(255,255,255,0.05); 
-        border-radius: 15px; 
-        align-items: center; /* Centra tutto anche su mobile */
+        display: flex; flex-direction: column; 
+        border-bottom: 1px solid #333; padding: 15px; margin-bottom: 10px; 
+        background: rgba(255,255,255,0.05); border-radius: 15px; align-items: center; 
     }
     .table-header-fixed { display: none; }
     
-    .table-row div { 
-        padding: 5px 0; 
-        font-size: 1.2rem; 
-        text-align: center; 
-        width: 100%; 
-        justify-content: center;
-    }
+    .table-row div { padding: 5px 0; font-size: 1.2rem; text-align: center; width: 100%; justify-content: center; }
     
     .data-ora::before { content: "Ora: "; opacity: 0.7; font-size: 0.9rem; }
     .data-classe::before { content: "Classe: "; opacity: 0.7; font-size: 0.9rem; }
@@ -223,4 +203,5 @@ footer { display: grid; grid-template-columns: 1fr 120px; gap: 15px; margin-top:
 
     footer { grid-template-columns: 1fr; }
     .meteo-giorno { flex-direction: column; text-align: center; }
+    .qr-footer-box { display: none; } /* Su mobile il QR non serve */
 }
