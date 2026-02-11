@@ -169,7 +169,7 @@ function costruisciTabella(dati) {
     let html = dati.map(riga => {
         let tagHtml = "";
         if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
-        else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA</span>`;
+        else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA RELIGIONE</span>`;
 
         return `
             <div class="table-row">
@@ -198,3 +198,4 @@ function aggiornaDataOra() {
 function attivaFullScreen() { if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
 
 window.onload = init;
+
