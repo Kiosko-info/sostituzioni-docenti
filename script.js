@@ -1,23 +1,13 @@
 // --- CONFIGURAZIONE ---
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxa-dWWpQVxE437Z0ECjvjYZqec57rG38jCP6UGDVz4NDmxLEnFL76F-If0-lCKDxefRw/exec"; 
-const PIN_SEGRETO = "1234"; 
+const PIN_SEGRETO = "1234"; // Cambialo con quello che preferisci
 
-let ultimoContenuto = "";
-let elencoNews = [], elencoCircolari = [];
-let meteoP1 = "", meteoP2 = "", indiceNews = 0, indiceCirc = 0, modoMeteoAttivo = false;
-let modoVisualizzazione = "oggi"; 
+let elencoNews = [];
+let meteoP1 = "", meteoP2 = "", indiceNews = 0, modoMeteoAttivo = false;
 
 function init() {
-    checkLogin();
+    checkLogin(); // Protezione per Mobile
     aggiornaDataOra();
-    
-    const savedName = localStorage.getItem("docentePreferito");
-    if (savedName) {
-        document.getElementById('cercaDocente').value = savedName;
-        document.getElementById('msgFiltro').style.display = "block";
-        document.getElementById('nomeSalvato').innerText = savedName;
-    }
-
     ricaricaDati(); 
 
     // CARICA NEWS E METEO SOLO SE NON SEI SU MOBILE
@@ -33,25 +23,9 @@ function init() {
     setInterval(ricaricaDati, 60000);
 }
 
-// --- FUNZIONE CHE GENERA L'HTML DI UNA RIGA (Ora centralizzata) ---
-function generaRiga(riga) {
-    let tagHtml = "";
-    if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
-    else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA</span>`;
-
-    return `
-        <div class="table-row row">
-            <div class="data-ora">${riga.ora}°</div>
-            <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
-            <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
-            <div class="data-sostituto">${String(riga.sostituto).toUpperCase()}</div>
-            <div class="data-info">${tagHtml}</div>
-        </div>`;
-}
-
-// --- GESTIONE LOGIN ---
+// --- PROTEZIONE PIN (SOLO MOBILE) ---
 function checkLogin() {
-    if (window.innerWidth > 768) return; 
+    if (window.innerWidth > 768) return; // Su monitor non serve login
     const isLogged = sessionStorage.getItem("monitor_logged");
     if (isLogged !== "true") {
         document.getElementById('overlay-login').style.display = "flex";
@@ -63,52 +37,26 @@ function verificaPin() {
     if (input === PIN_SEGRETO) {
         sessionStorage.setItem("monitor_logged", "true");
         document.getElementById('overlay-login').style.display = "none";
-        filtraPerDocente(); 
     } else {
-        document.getElementById('msgErrore').style.display = "block";
+        alert("PIN Errato!");
         document.getElementById('inputPin').value = "";
     }
 }
 
-// --- GESTIONE PREFERENZE ---
-function salvaPreferenza() {
-    const nome = document.getElementById('cercaDocente').value.trim();
-    if (nome) {
-        localStorage.setItem("docentePreferito", nome);
-        alert(`Preferenza salvata per: ${nome}`);
-        document.getElementById('msgFiltro').style.display = "block";
-        document.getElementById('nomeSalvato').innerText = nome;
-        filtraPerDocente();
-    } else {
-        localStorage.removeItem("docentePreferito");
-        alert("Preferenza rimossa.");
-        document.getElementById('msgFiltro').style.display = "none";
-        filtraPerDocente();
-    }
-}
+// --- GENERATORE DI RIGHE ---
+function generaRiga(riga) {
+    let tagHtml = "";
+    if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
+    else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA</span>`;
 
-function filtraPerDocente() {
-    if (window.innerWidth > 768) return; 
-
-    const input = document.getElementById('cercaDocente').value.toUpperCase();
-    const righe = document.querySelectorAll('.table-row.row'); 
-    
-    righe.forEach(riga => {
-        const sostTxt = riga.querySelector('.data-sostituto').innerText.toUpperCase();
-        if (input === "" || sostTxt.includes(input)) {
-            riga.style.display = "grid"; // Grid è necessario per il layout card del tuo CSS
-        } else {
-            riga.style.display = "none";
-        }
-    });
-}
-
-async function cambiaModo(modo) {
-    modoVisualizzazione = modo;
-    document.getElementById('btnOggi').classList.toggle('active', modo === 'oggi');
-    document.getElementById('btnFuture').classList.toggle('active', modo === 'future');
-    document.getElementById('scroller-content').innerHTML = "<div style='text-align:center; padding:20px;'>Caricamento dati...</div>";
-    await ricaricaDati();
+    return `
+        <div class="table-row">
+            <div class="data-ora">${riga.ora}°</div>
+            <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
+            <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
+            <div class="data-sostituto">${String(riga.sostituto).toUpperCase()}</div>
+            <div class="data-info">${tagHtml}</div>
+        </div>`;
 }
 
 // --- DATI & INTERFACCIA ---
@@ -124,75 +72,26 @@ async function ricaricaDati() {
     if(dot) dot.classList.add('dot-active');
 
     try {
-        let url = "";
         const dataOggi = new Date().toISOString().split('T')[0];
-        
-        if (modoVisualizzazione === "future") {
-            url = `${SCRIPT_URL}?action=getSubstitutions&future=true`;
-            document.getElementById('giornoSostituzioni').innerText = "SOSTITUZIONI PROGRAMMATE";
-        } else {
-            url = `${SCRIPT_URL}?action=getSubstitutions&date=${dataOggi}`;
-            const dataBella = new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
-            document.getElementById('giornoSostituzioni').innerText = `SITUAZIONE DEL ${dataBella}`;
-        }
-
-        const response = await fetch(url);
+        const response = await fetch(`${SCRIPT_URL}?action=getSubstitutions&date=${dataOggi}`);
         const dati = await response.json();
+
+        const dataBella = new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+        document.getElementById('giornoSostituzioni').innerText = `SITUAZIONE DEL ${dataBella}`;
 
         if (!dati || dati.length === 0) {
             document.getElementById('scroller-content').innerHTML = "<div style='text-align:center; padding:50px; opacity:0.6;'>NESSUNA SOSTITUZIONE TROVATA</div>";
         } else {
             costruisciTabella(dati);
         }
-        
-        if (window.innerWidth <= 768) filtraPerDocente();
-
-    } catch (e) {
-        console.error("Errore:", e);
-    } finally {
-        if(dot) setTimeout(() => { dot.classList.remove('dot-active'); }, 1500);
-    }
-}
-
-function toggleDate(dateId) {
-    const group = document.getElementById(dateId);
-    const header = document.getElementById("header-" + dateId);
-    
-    if (group.classList.contains("hidden")) {
-        group.classList.remove("hidden");
-        header.classList.remove("collapsed");
-    } else {
-        group.classList.add("hidden");
-        header.classList.add("collapsed");
-    }
+    } catch (e) { console.error(e); }
+    finally { if(dot) setTimeout(() => dot.classList.remove('dot-active'), 1500); }
 }
 
 function costruisciTabella(dati) {
     const scroller = document.getElementById('scroller-content');
     dati.sort((a, b) => a.ora - b.ora);
 
-    // MOBILE FISARMONICA (Future)
-    if (window.innerWidth <= 768 && modoVisualizzazione === "future") {
-        scroller.style.animation = "none";
-        const gruppi = {};
-        dati.forEach(riga => {
-            if (!gruppi[riga.data]) gruppi[riga.data] = [];
-            gruppi[riga.data].push(riga);
-        });
-
-        let htmlMobile = "";
-        for (const [data, righe] of Object.entries(gruppi)) {
-            const safeId = "group-" + data.replace(/[^a-zA-Z0-9]/g, "");
-            htmlMobile += `<div id="header-${safeId}" class="date-divider" onclick="toggleDate('${safeId}')">📅 ${data}</div>`;
-            htmlMobile += `<div id="${safeId}" class="day-group">`;
-            righe.forEach(riga => { htmlMobile += generaRiga(riga); });
-            htmlMobile += `</div>`;
-        }
-        scroller.innerHTML = htmlMobile;
-        return;
-    }
-
-    // LOGICA STANDARD
     let html = "";
     dati.forEach(riga => { html += generaRiga(riga); });
 
@@ -200,21 +99,21 @@ function costruisciTabella(dati) {
         scroller.innerHTML = html;
         scroller.style.animation = "none";
     } else {
-        const separator = `<div class="table-row" style="height:120px; display:flex; align-items:center; justify-content:center; color:var(--accent); font-weight:800; opacity:0.4; grid-column: 1 / -1; border-bottom:2px dashed var(--accent);">--- RICOMINCIA ELENCO ---</div>`;
+        const separator = `<div class="table-row" style="height:120px; display:flex; align-items:center; justify-content:center; color:var(--accent); font-weight:800; opacity:0.4; grid-column: 1 / -1; border-bottom:2px dashed var(--accent);">--- FINE ELENCO ---</div>`;
         scroller.innerHTML = html + separator + html + separator;
         const durata = Math.max(20, dati.length * 5);
         scroller.style.animation = `infiniteScroll ${durata}s linear infinite`;
     }
 }
 
-// --- FUNZIONI METEO E NEWS (Senza cambiamenti logici, ma attivate solo su PC dall'init) ---
-function getMeteoIcon(code) { const icone = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 48: "🌫️", 51: "🌦️", 61: "🌧️", 63: "🌧️", 71: "🌨️", 80: "🌦️", 95: "⛈️" }; return icone[code] || "☀️"; }
+// --- METEO E NEWS (Su monitor) ---
 async function aggiornaMeteo() {
     try {
-        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=41.9028&longitude=12.4964&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=39.2238&longitude=9.1217&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
         const data = await r.json();
         document.getElementById('meteoIcon').innerHTML = getMeteoIcon(data.current_weather.weathercode);
         document.getElementById('temp').innerText = Math.round(data.current_weather.temperature) + "°C";
+        
         const giorniSett = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
         let prev = [];
         for(let i=0; i<7; i++) {
@@ -226,6 +125,9 @@ async function aggiornaMeteo() {
         meteoP2 = `<div class="meteo-settimana">${prev.slice(4, 7).map(g => renderG(g)).join('')}</div>`;
     } catch(e) {}
 }
+
+function getMeteoIcon(code) { const icone = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 48: "🌫️", 51: "🌦️", 61: "🌧️", 63: "🌧️", 71: "🌨️", 80: "🌦️", 95: "⛈️" }; return icone[code] || "☀️"; }
+
 async function caricaNewsRss() {
     const proxy = "https://corsproxy.io/?";
     const feeds = [{n:'Ansa', u:'https://www.ansa.it/sito/ansait_rss.xml'}];
@@ -238,6 +140,7 @@ async function caricaNewsRss() {
         } catch(e) {}
     }
 }
+
 function ruotaNews() {
     const aN = document.getElementById('fadeNews');
     const labelN = document.getElementById('labelNews');
@@ -252,6 +155,7 @@ function ruotaNews() {
         }, 1000);
     }
 }
+
 function ruotaCircolariMeteo() {
     const aC = document.getElementById('fadeCircolari');
     const labelC = document.getElementById('labelCircolari');
@@ -266,13 +170,8 @@ function ruotaCircolariMeteo() {
             labelC.innerText = "🌤️ PREVISIONI (2/2)"; labelC.style.background = "#0ea5e9";
             aC.innerHTML = meteoP2 || "Caricamento..."; aC.classList.add('show');
             setTimeout(() => { modoMeteoAttivo = false; ruotaCircolariMeteo(); }, 10000);
-        } else {
-            modoMeteoAttivo = "p1"; ruotaCircolariMeteo();
-        }
+        } else { modoMeteoAttivo = "p1"; ruotaCircolariMeteo(); }
     }, 1000);
 }
 
 window.onload = init;
-window.onload = init;
-
-
