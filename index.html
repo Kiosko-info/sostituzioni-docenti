@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body onclick="attivaFullScreen()">
+
+    <div id="overlay-login" style="display: none;">
+        <div class="login-box">
+            <div class="login-icon">🔒</div>
+            <h2>Area Riservata</h2>
+            <p>Inserisci il PIN per visualizzare le sostituzioni di oggi</p>
+            <input type="password" id="inputPin" placeholder="Inserisci PIN" inputmode="numeric">
+            <button onclick="verificaPin()">ACCEDI</button>
+            <div id="msgErrore" style="color: #ff4d4d; margin-top: 10px; display: none; font-weight: bold;">PIN Errato!</div>
+        </div>
+    </div>
+
     <header>
         <div class="logo-scuola">IIS BUCCARI<br>MARCONI</div>
         <div class="titolo-centrale">
@@ -41,15 +53,16 @@
     <footer>
         <div class="footer-tickers">
             <div class="ticker-row">
-                <div class="ticker-label" style="background:#6366f1">📢 Circolari</div>
+                <div id="labelCircolari" class="ticker-label" style="background:#0ea5e9">🌤️ METEO</div>
                 <div id="fadeCircolari" class="fade-container"></div>
             </div>
             <div class="ticker-row">
-                <div class="ticker-label" style="background:#1e293b">🌍 News</div>
+                <div id="labelNews" class="ticker-label" style="background:#1e293b">🌍 NEWS</div>
                 <div id="fadeNews" class="fade-container"></div>
             </div>
         </div>
-        <div class="qr-footer-box"></div>
+        <div class="qr-footer-box">
+            </div>
     </footer>
 
     <script src="script.js"></script>
