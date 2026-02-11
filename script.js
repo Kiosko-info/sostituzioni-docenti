@@ -1,5 +1,5 @@
 // --- CONFIGURAZIONE ---
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxa-dWWpQVxE437Z0ECjvjYZqec57rG38jCP6UGDVz4NDmxLEnFL76F-If0-lCKDxefRw/exec"; 
+const SCRIPT_URL = "INSERISCI_QUI_IL_TUO_URL_APPS_SCRIPT"; 
 const PIN_SEGRETO = "1234"; 
 
 let ultimoContenuto = "";
@@ -7,7 +7,6 @@ let elencoNews = [], elencoCircolari = [];
 let meteoP1 = "", meteoP2 = "", indiceNews = 0, indiceCirc = 0, modoMeteoAttivo = false;
 let modoVisualizzazione = "oggi"; // "oggi" o "future"
 
-// --- SETUP INIZIALE ---
 function init() {
     checkLogin();
     aggiornaDataOra();
@@ -20,11 +19,10 @@ function init() {
         document.getElementById('nomeSalvato').innerText = savedName;
     }
 
-    ricaricaDati(); // Parte con "Oggi" di default
+    ricaricaDati(); 
     caricaNewsRss(); 
     aggiornaMeteo();
 
-    // Timer
     setInterval(aggiornaDataOra, 1000);
     setInterval(ricaricaDati, 60000);
     setInterval(ruotaNews, 8000);
@@ -32,9 +30,9 @@ function init() {
     setTimeout(ruotaCircolariMeteo, 5000);
 }
 
-// --- GESTIONE LOGIN MOBILE ---
+// --- GESTIONE LOGIN ---
 function checkLogin() {
-    if (window.innerWidth > 768) return; // Su PC salta il login
+    if (window.innerWidth > 768) return; 
     const isLogged = sessionStorage.getItem("monitor_logged");
     if (isLogged !== "true") {
         document.getElementById('overlay-login').style.display = "flex";
@@ -46,14 +44,14 @@ function verificaPin() {
     if (input === PIN_SEGRETO) {
         sessionStorage.setItem("monitor_logged", "true");
         document.getElementById('overlay-login').style.display = "none";
-        filtraPerDocente(); // Applica filtro se necessario
+        filtraPerDocente(); 
     } else {
         document.getElementById('msgErrore').style.display = "block";
         document.getElementById('inputPin').value = "";
     }
 }
 
-// --- GESTIONE PREFERENZE DOCENTE ---
+// --- GESTIONE PREFERENZE ---
 function salvaPreferenza() {
     const nome = document.getElementById('cercaDocente').value.trim();
     if (nome) {
@@ -71,14 +69,13 @@ function salvaPreferenza() {
 }
 
 function filtraPerDocente() {
-    if (window.innerWidth > 768) return; // Non filtrare su PC
+    if (window.innerWidth > 768) return; 
 
     const input = document.getElementById('cercaDocente').value.toUpperCase();
     const righe = document.querySelectorAll('.table-row.row'); 
     
     righe.forEach(riga => {
         const sostTxt = riga.querySelector('.data-sostituto').innerText.toUpperCase();
-        // Permettiamo la ricerca anche se l'input è vuoto (mostra tutto)
         if (input === "" || sostTxt.includes(input)) {
             riga.style.display = "flex"; 
         } else {
@@ -95,7 +92,7 @@ async function cambiaModo(modo) {
     await ricaricaDati();
 }
 
-// --- FUNZIONI DATI E INTERFACCIA ---
+// --- DATI & INTERFACCIA ---
 function attivaFullScreen() { if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
 
 function aggiornaDataOra() {
@@ -129,7 +126,6 @@ async function ricaricaDati() {
             costruisciTabella(dati);
         }
         
-        // Filtra subito se su mobile
         if (window.innerWidth <= 768) filtraPerDocente();
 
     } catch (e) {
@@ -139,26 +135,74 @@ async function ricaricaDati() {
     }
 }
 
+// --- FUNZIONE TOGGLE PER DATE FUTURE (FISARMONICA) ---
+function toggleDate(dateId) {
+    const group = document.getElementById(dateId);
+    const header = document.getElementById("header-" + dateId);
+    
+    if (group.classList.contains("hidden")) {
+        group.classList.remove("hidden");
+        header.classList.remove("collapsed");
+    } else {
+        group.classList.add("hidden");
+        header.classList.add("collapsed");
+    }
+}
+
 function costruisciTabella(dati) {
     const scroller = document.getElementById('scroller-content');
     
     // Ordinamento
-    if (modoVisualizzazione === "future") {
-        dati.sort((a, b) => a.ora - b.ora); // O per data se il backend la fornisce ordinabile
-    } else {
-        dati.sort((a, b) => a.ora - b.ora);
+    dati.sort((a, b) => a.ora - b.ora);
+
+    // SE SIAMO SU MOBILE, USIAMO LA LOGICA A GRUPPI (FISARMONICA)
+    if (window.innerWidth <= 768 && modoVisualizzazione === "future") {
+        scroller.style.animation = "none";
+        
+        // Raggruppa i dati per data
+        const gruppi = {};
+        dati.forEach(riga => {
+            if (!gruppi[riga.data]) gruppi[riga.data] = [];
+            gruppi[riga.data].push(riga);
+        });
+
+        let htmlMobile = "";
+        // Per ogni data crea un gruppo
+        for (const [data, righe] of Object.entries(gruppi)) {
+            // Crea ID univoco (togliendo spazi e slash)
+            const safeId = "group-" + data.replace(/[^a-zA-Z0-9]/g, "");
+            
+            // Intestazione Cliccabile
+            htmlMobile += `<div id="header-${safeId}" class="date-divider" onclick="toggleDate('${safeId}')">📅 ${data}</div>`;
+            
+            // Contenitore Righe
+            htmlMobile += `<div id="${safeId}" class="day-group">`;
+            
+            righe.forEach(riga => {
+                let tagHtml = "";
+                if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
+                else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA</span>`;
+
+                htmlMobile += `
+                    <div class="table-row row">
+                        <div class="data-ora">${riga.ora}°</div>
+                        <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
+                        <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
+                        <div class="data-sostituto">${String(riga.sostituto).toUpperCase()}</div>
+                        <div class="data-info">${tagHtml}</div>
+                    </div>`;
+            });
+            
+            htmlMobile += `</div>`; // Chiude gruppo
+        }
+        
+        scroller.innerHTML = htmlMobile;
+        return; // Esci, abbiamo finito per il mobile
     }
 
+    // --- LOGICA STANDARD (PC / MOBILE OGGI) ---
     let html = "";
-    let lastDate = "";
-
     dati.forEach(riga => {
-        // Divisore data per le future
-        if (modoVisualizzazione === "future" && riga.data && riga.data !== lastDate) {
-            html += `<div class="date-divider">📅 ${riga.data}</div>`;
-            lastDate = riga.data;
-        }
-
         let tagHtml = "";
         if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
         else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA</span>`;
@@ -184,7 +228,7 @@ function costruisciTabella(dati) {
     }
 }
 
-// --- METEO & NEWS ---
+// METEO E NEWS (INVARIATI)
 function getMeteoIcon(code) { const icone = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 48: "🌫️", 51: "🌦️", 61: "🌧️", 63: "🌧️", 71: "🌨️", 80: "🌦️", 95: "⛈️" }; return icone[code] || "☀️"; }
 async function aggiornaMeteo() {
     try {
@@ -250,6 +294,4 @@ function ruotaCircolariMeteo() {
     }, 1000);
 }
 
-// AVVIO
 window.onload = init;
-setTimeout(ruotaCircolariMeteo, 5000);
