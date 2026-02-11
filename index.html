@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monitor Live - Sostituzioni</title>
+    <title>Sostituzioni Buccari Marconi</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body onclick="attivaFullScreen()">
-
     <header>
         <div class="logo-scuola">IIS BUCCARI<br>MARCONI</div>
         <div class="titolo-centrale">
@@ -25,20 +24,6 @@
     </header>
 
     <main>
-        <div id="mobile-dashboard">
-            <div class="search-row">
-                <input type="text" id="cercaDocente" placeholder="🔍 Cerca il tuo cognome..." onkeyup="filtraPerDocente()">
-                <button id="btnSalvaNome" onclick="salvaPreferenza()">💾</button>
-            </div>
-            <div class="tabs-row">
-                <button class="tab-btn active" id="btnOggi" onclick="cambiaModo('oggi')">OGGI</button>
-                <button class="tab-btn" id="btnFuture" onclick="cambiaModo('future')">PROGRAMMATE</button>
-            </div>
-            <div id="msgFiltro" style="display:none;">
-                Filtro attivo: <span id="nomeSalvato"></span>
-            </div>
-        </div>
-
         <div class="table-header-fixed">
             <div>ORA</div>
             <div>CLASSE</div>
