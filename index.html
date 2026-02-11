@@ -2,247 +2,57 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Sostituzioni">
-    
-    <link rel="apple-touch-icon" href="logo.png?v=2">
-    <link rel="icon" type="image/png" href="logo.png?v=2">
-    
-    <title>Sostituzioni - IIS Buccari Marconi</title>
-    <style>
-        :root {
-            --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
-            --accent: #3b82f6; --gold: #fbbf24; --border: #334155;
-            --success: #10b981;
-        }
-        body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            background: var(--bg); color: var(--text); 
-            margin: 0; padding: 15px; padding-bottom: 90px;
-        }
-        header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--gold); padding-bottom: 15px; }
-        h1 { font-size: 0.8rem; margin: 0; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
-        
-        #dataMobile {
-            background: #2d3a4f;
-            color: var(--gold);
-            border: 1px solid var(--gold);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            font-family: inherit;
-            text-align: center;
-            width: 80%;
-            outline: none;
-        }
-
-        .status-bar { 
-            display: flex; justify-content: space-between; font-size: 0.7rem; 
-            background: var(--card); padding: 8px 12px; border-radius: 8px; margin-bottom: 15px;
-            border: 1px solid var(--border);
-        }
-
-        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
-        th { background: #2d3a4f; color: var(--gold); padding: 12px 8px; font-size: 0.65rem; text-transform: uppercase; text-align: left; }
-        td { padding: 14px 8px; border-bottom: 1px solid var(--border); font-size: 0.85rem; vertical-align: middle; }
-        
-        .ora { font-weight: bold; color: var(--accent); width: 15%; }
-        .docente-assente { color: var(--text); opacity: 0.8; font-size: 0.8rem; }
-        .docente-sostituto { font-weight: bold; color: var(--text); }
-        .classe-aula { color: #94a3b8; font-size: 0.75rem; text-align: right; line-height: 1.2; }
-        
-        .empty { text-align: center; padding: 60px 20px; opacity: 0.5; font-style: italic; }
-        
-        .btn-share {
-            position: fixed; bottom: 20px; right: 20px;
-            background: var(--accent); color: white;
-            border: none; border-radius: 50px;
-            padding: 12px 20px; font-weight: bold; font-size: 0.85rem;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 8px;
-            cursor: pointer; z-index: 100;
-        }
-
-        /* Sezione Privacy & Logout */
-        .privacy-footer {
-            margin-top: 30px;
-            padding: 15px;
-            font-size: 0.65rem;
-            color: #64748b;
-            text-align: center;
-            border-top: 1px solid var(--border);
-            line-height: 1.4;
-        }
-        .btn-logout {
-            background: none;
-            border: 1px solid #64748b;
-            color: #64748b;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.6rem;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        .syncing { color: var(--accent); animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Live - IIS Buccari Marconi</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="https://emojicdn.elk.sh/📺"> 
 </head>
-<body>
-
+<body onclick="attivaFullScreen()">
     <header>
-        <h1>IIS BUCCARI MARCONI</h1>
-        <input type="date" id="dataMobile" onchange="caricaDati()">
+        <div style="font-size: 0.8rem; opacity: 0.6; font-weight: 700; line-height: 1.2;">ISTITUTO<br>COMPRENSIVO</div>
+        <div class="titolo-centrale">
+            <div class="main-title">Sostituzioni Live</div>
+            <div id="giornoSostituzioni" class="sub-title">CARICAMENTO...</div>
+        </div>
+        <div class="info-destra">
+            <div id="statusDot"></div>
+            <div class="meteo-box">
+                <span id="meteoIcon" style="font-size: 1.8rem;">--</span>
+                <span id="temp" style="margin-left:5px">--°C</span>
+            </div>
+            <div id="dataOra">...</div>
+        </div>
     </header>
 
-    <div class="status-bar">
-        <span id="status">🔄 In attesa...</span>
-        <span id="lastUpdate"></span>
-    </div>
+    <main>
+        <div id="header-container" class="table-row table-header-fixed">
+            <div class="col-ora">ORA</div>
+            <div class="col-classe">CLASSE</div>
+            <div class="col-aula">AULA</div>
+            <div class="col-sostituto header-align-left">SOSTITUTO</div>
+            <div class="col-info">INFO</div>
+        </div>
+        <div id="scroll-container">
+            <div id="scroller-content" class="scroller"></div>
+        </div>
+    </main>
 
-    <table id="tabellaSostituzioni">
-        <thead>
-            <tr>
-                <th>Ora</th>
-                <th>Assente</th>
-                <th>Sostituto</th>
-                <th style="text-align: right;">Classe</th>
-            </tr>
-        </thead>
-        <tbody id="corpoTabella">
-            <tr><td colspan="4" class="empty">Inserire password per caricare i dati...</td></tr>
-        </tbody>
-    </table>
-
-    <button class="btn-share" onclick="condividiApp()">
-        <span>🔗</span> CONDIVIDI
-    </button>
-
-    <div class="privacy-footer">
-        <p><strong>INFORMATIVA PRIVACY (GDPR)</strong><br>
-        I dati visualizzati sono ad esclusivo uso interno del personale in servizio presso l'IIS Buccari Marconi. 
-        È vietata la diffusione, la pubblicazione o la comunicazione a terzi non autorizzati. 
-        I dati sono limitati alle sole finalità organizzative (Art. 6 GDPR).</p>
-        <button class="btn-logout" onclick="logout()">🔐 Esci dall'Area Docenti</button>
-    </div>
-
-<script>
-    const SCRIPT_URL = "https://script.google.com/a/macros/buccarimarconi.edu.it/s/AKfycbz-4X4zTVGoXK_EwMwvbBelirZ3CzTEA1hjiHYN7xZOO1Vj_h0JBTYlyG8BHzSpTz32/exec";
-    const PASSWORD_SISTEMA = "buccari2026"; 
-
-    // 1. Controllo Password con protezione migliorata
-    if (localStorage.getItem("auth_buccari") !== "attivo") {
-        let p = prompt("ACCESSO RISERVATO\nInserire la password Area Docenti:");
-        if (p === PASSWORD_SISTEMA) {
-            localStorage.setItem("auth_buccari", "attivo");
-            location.reload();
-        } else if (p !== null) {
-            alert("Password errata. Accesso negato.");
-            document.body.innerHTML = "<div style='text-align:center;padding:50px;color:white;'><h3>Accesso non autorizzato</h3><button onclick='location.reload()'>Riprova</button></div>";
-            throw new Error("Auth fallita");
-        } else {
-             document.body.innerHTML = ""; // Se annulla il prompt
-             throw new Error("Cancellato dall'utente");
-        }
-    }
-
-    // 2. Impostazione Data
-    const picker = document.getElementById("dataMobile");
-    if (!picker.value) {
-        picker.value = new Date().toISOString().split('T')[0];
-    }
-
-    // 3. Funzione Caricamento Dati
-    async function caricaDati() {
-        const status = document.getElementById("status");
-        const dataScelta = new Date(picker.value).setHours(0,0,0,0);
-        
-        status.innerText = "🔄 Sincronizzazione...";
-        status.classList.add("syncing");
-
-        try {
-            const res = await fetch(SCRIPT_URL + "?t=" + Date.now());
-            const elenco = await res.json();
-            
-            const filtrati = elenco.filter(s => {
-                let dCloud;
-                if(s.data.includes("/")) {
-                    const p = s.data.split("/");
-                    dCloud = new Date(p[2], p[1]-1, p[0]).setHours(0,0,0,0);
-                } else {
-                    dCloud = new Date(s.data).setHours(0,0,0,0);
-                }
-                return dCloud === dataScelta;
-            }).sort((a,b) => a.ora.localeCompare(b.ora, undefined, {numeric: true}));
-
-            render(filtrati);
-            
-            status.innerText = "✅ Online";
-            status.classList.remove("syncing");
-            document.getElementById("lastUpdate").innerText = "Agg. " + new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
-            
-        } catch (e) {
-            status.innerText = "⚠️ Errore Rete";
-            status.classList.remove("syncing");
-        }
-    }
-
-    function render(dati) {
-        const corpo = document.getElementById("corpoTabella");
-        if (dati.length === 0) {
-            corpo.innerHTML = `<tr><td colspan="4" class="empty">Nessuna sostituzione per questa data.</td></tr>`;
-            return;
-        }
-        corpo.innerHTML = dati.map(s => `
-            <tr>
-                <td class="ora">${s.ora}</td>
-                <td class="docente-assente">${s.assente}</td>
-                <td class="docente-sostituto">${s.sostituto}</td>
-                <td class="classe-aula">${s.classe}<br><small>${s.aula}</small></td>
-            </tr>
-        `).join('');
-    }
-
-    // 4. Funzioni Utilità (Share e Logout)
-    async function condividiApp() {
-        const shareData = {
-            title: 'Sostituzioni Buccari',
-            text: 'Link sostituzioni docenti:',
-            url: window.location.href
-        };
-        if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            try { await navigator.share(shareData); } catch (err) {}
-        } else {
-            try {
-                await navigator.clipboard.writeText(window.location.href);
-                alert("Link copiato negli appunti! 📋");
-            } catch (err) {
-                alert("Link: " + window.location.href);
-            }
-        }
-    }
-
-    function logout() {
-        if(confirm("Vuoi disconnetterti dall'Area Docenti?")) {
-            localStorage.removeItem("auth_buccari");
-            location.reload();
-        }
-    }
-
-    // Avvio e Loop
-    caricaDati();
-    setInterval(caricaDati, 60000);
-</script>
+    <footer>
+        <div class="footer-tickers">
+            <div class="ticker-row">
+                <div id="labelCircolari" class="ticker-label" style="background:#6366f1">📢 Circolari</div>
+                <div id="fadeCircolari" class="fade-container"></div>
+            </div>
+            <div class="ticker-row">
+                <div id="labelNews" class="ticker-label" style="background:#1e293b">🌍 News</div>
+                <div id="fadeNews" class="fade-container"></div>
+            </div>
+        </div>
+        <div class="qr-footer-box">
+            <span style="font-size: 2rem;">📱</span>
+            <span>INFO ONLINE</span>
+        </div>
+    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
