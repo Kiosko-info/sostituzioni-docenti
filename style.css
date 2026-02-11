@@ -1,13 +1,12 @@
-/* --- FILE style.css - DESIGN "APP MODERN DARK" --- */
-
+/* --- CONFIGURAZIONE VARIABILI --- */
 :root {
-    --bg-dark: #0f172a;       /* Blu scuro profondo */
-    --card-bg: rgba(30, 41, 59, 0.7); /* Vetro scuro */
-    --accent: #38bdf8;        /* Azzurro Apple */
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --accent: #38bdf8;
     --accent-glow: rgba(56, 189, 248, 0.3);
     --text-main: #f1f5f9;
     --text-muted: #94a3b8;
-    --success: #4ade80;       /* Verde brillante */
+    --success: #4ade80;
     --border: rgba(255, 255, 255, 0.1);
 }
 
@@ -15,16 +14,76 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: linear-gradient(135deg, #020617 0%, #1e293b 100%); /* Sfondo premium */
+    background: linear-gradient(135deg, #020617 0%, #1e293b 100%);
     background-attachment: fixed;
     height: 100vh;
     display: flex;
     flex-direction: column;
     color: var(--text-main);
-    overflow: hidden; /* Desktop non scrolla il body */
+    overflow: hidden;
 }
 
-/* --- HEADER DESKTOP --- */
+/* --- OVERLAY LOGIN (Stile Moderno) --- */
+#overlay-login {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.95);
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-box {
+    background: #1e293b;
+    padding: 40px 30px;
+    border-radius: 24px;
+    border: 1px solid var(--accent);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px var(--accent-glow);
+    text-align: center;
+    width: 90%;
+    max-width: 380px;
+}
+
+.login-icon { font-size: 3rem; margin-bottom: 15px; }
+
+.login-box h2 { margin-bottom: 10px; font-weight: 800; color: #fff; }
+
+.login-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; }
+
+.login-box input {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 5px;
+    margin-bottom: 20px;
+    outline: none;
+}
+
+.login-box input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+
+.login-box button {
+    width: 100%;
+    background: var(--accent);
+    color: #0f172a;
+    font-weight: 800;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.login-box button:active { transform: scale(0.98); }
+
+/* --- HEADER --- */
 header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -33,51 +92,39 @@ header {
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     z-index: 10;
 }
 
-.titolo-centrale { text-align: center; }
 .main-title {
     font-size: 1.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
     background: linear-gradient(to right, #fff, var(--accent));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-.sub-title { font-size: 0.9rem; color: var(--accent); font-weight: 600; margin-top: 5px; }
 
-.info-destra { justify-self: end; display: flex; gap: 15px; font-weight: 600; align-items: center;}
-#statusDot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; opacity: 0; transition: 0.3s; }
+.sub-title { font-size: 0.9rem; color: var(--accent); font-weight: 600; text-align: center; }
+
+.info-destra { justify-self: end; display: flex; gap: 15px; align-items: center; }
+
+#statusDot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; opacity: 0; }
 .dot-active { opacity: 1 !important; box-shadow: 0 0 10px #22c55e; }
 
-/* --- MAIN --- */
-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 20px;
-}
+/* --- MAIN & TABLE --- */
+main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 20px; }
 
-/* --- NASCONDI DASHBOARD MOBILE SU PC --- */
-#mobile-dashboard { display: none !important; }
-
-/* --- TABELLA DESKTOP (5 Colonne) --- */
 .table-header-fixed {
     display: grid;
     grid-template-columns: 0.8fr 1fr 1fr 3fr 1.5fr;
-    padding: 15px 10px;
+    padding: 15px;
     background: rgba(2, 6, 23, 0.8);
     border-radius: 12px 12px 0 0;
-    font-weight: 800; color: var(--accent); letter-spacing: 1px;
-    border-bottom: 2px solid var(--accent);
+    font-weight: 800; color: var(--accent);
 }
 
-.table-header-fixed div { text-align: center; }
+.table-header-fixed div { text-align: center; font-size: 0.8rem; letter-spacing: 1px; }
 
 #scroll-container {
     flex: 1; overflow: hidden; position: relative;
     background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(10px);
     border-radius: 0 0 12px 12px;
 }
 
@@ -91,15 +138,11 @@ main {
     border-bottom: 1px solid var(--border);
     font-size: 1.4rem;
 }
-.table-row:nth-child(even) { background: rgba(255,255,255,0.02); }
 
 .table-row div { text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Colori Testo Desktop */
 .data-ora { color: var(--accent); font-weight: 700; }
-.data-sostituto { color: var(--success); font-weight: 800; text-shadow: 0 0 10px rgba(74, 222, 128, 0.2); }
+.data-sostituto { color: var(--success); font-weight: 800; }
 
-/* Tags */
 .tag {
     font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: 800;
     text-transform: uppercase; display: inline-block;
@@ -107,113 +150,29 @@ main {
 .tag-compresenza { background: var(--accent); color: #000; }
 .tag-vigilanza { background: #a855f7; color: #fff; }
 
-/* Animation Keyframes */
 @keyframes infiniteScroll { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 
-/* --- FOOTER DESKTOP --- */
-footer { display: grid; grid-template-columns: 1fr 100px; gap: 15px; margin-top: 15px; padding: 0 20px 20px 20px; }
+/* --- FOOTER --- */
+footer { display: grid; grid-template-columns: 1fr 100px; gap: 15px; padding: 20px; }
 .footer-tickers { display: flex; flex-direction: column; gap: 10px; }
-.ticker-row { background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border); border-radius: 10px; height: 50px; display: flex; align-items: center; overflow: hidden; }
-.ticker-label { padding: 0 20px; font-weight: 800; font-size: 0.8rem; height: 100%; display: flex; align-items: center; min-width: 180px; }
-.fade-container { padding: 0 20px; font-size: 1.1rem; opacity: 0; transition: 1s; }
+.ticker-row { background: rgba(15, 23, 42, 0.8); border-radius: 10px; height: 50px; display: flex; align-items: center; overflow: hidden; }
+.ticker-label { padding: 0 15px; font-weight: 800; font-size: 0.75rem; height: 100%; display: flex; align-items: center; min-width: 160px; color: #fff; }
+.fade-container { padding-left: 15px; font-size: 1.1rem; opacity: 0; transition: 1s; flex: 1; }
 .show { opacity: 1; }
-.qr-footer-box { background: white url('qr-code.png') center/85% no-repeat; border-radius: 10px; }
+.qr-footer-box { background: white url('qr-code.png') center/80% no-repeat; border-radius: 10px; }
 
-/* --- OVERLAY LOGIN --- */
-#overlay-login {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999;
-    justify-content: center; align-items: center; backdrop-filter: blur(10px);
-}
-.login-box {
-    background: #1e293b; padding: 40px; border-radius: 20px; text-align: center; border: 1px solid var(--accent);
-    box-shadow: 0 0 40px var(--accent-glow);
-}
-.login-box input {
-    background: #0f172a; border: 1px solid var(--border); color: white; padding: 15px;
-    font-size: 1.5rem; border-radius: 10px; text-align: center; width: 100%; margin: 20px 0; outline: none;
-}
-.login-box button {
-    background: var(--accent); color: #000; font-weight: 800; padding: 15px 30px; border: none; border-radius: 10px; width: 100%; font-size: 1rem;
-}
-
-/* ============================================================
-   MOBILE DESIGN (APP STYLE) - COMPLETAMENTE RINNOVATO
-   ============================================================ */
+/* --- RESPONSIVE MOBILE --- */
 @media screen and (max-width: 768px) {
-    body {
-        height: auto; overflow-y: auto; padding: 0; 
-        background: #0f172a; /* Fondo piatto scuro per mobile */
-    }
-
-    /* Header Minimo */
-    header {
-        position: sticky; top: 0; z-index: 50;
-        grid-template-columns: 1fr; padding: 15px; gap: 5px;
-        background: rgba(15, 23, 42, 0.95);
-        border-bottom: 1px solid var(--border);
-    }
-    .main-title { font-size: 1.2rem; }
-    .sub-title { font-size: 0.8rem; opacity: 0.8; margin: 0; }
-    .info-destra, footer, .table-header-fixed { display: none !important; }
-
-    main { padding: 15px; overflow: visible; }
-    #scroll-container { background: transparent; overflow: visible; backdrop-filter: none; }
-    .scroller { position: static; animation: none !important; }
-
-    /* --- DASHBOARD STILE APP --- */
-    #mobile-dashboard {
-        display: flex !important; flex-direction: column; gap: 15px;
-        background: #1e293b; padding: 20px; border-radius: 20px;
-        margin-bottom: 25px; border: 1px solid var(--border);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    /* Input di Ricerca */
-    .search-row { display: flex; gap: 10px; }
-    #cercaDocente {
-        flex: 1; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border);
-        background: #0f172a; color: white; font-size: 1rem; outline: none; transition: 0.3s;
-    }
-    #cercaDocente:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    body { height: auto; overflow-y: auto; }
     
-    #btnSalvaNome {
-        background: var(--accent); border: none; border-radius: 12px; width: 50px;
-        font-size: 1.2rem; color: #0f172a; display: flex; align-items: center; justify-content: center;
-    }
+    header { grid-template-columns: 1fr; padding: 15px; position: sticky; top: 0; }
+    .info-destra, footer, .table-header-fixed { display: none !important; }
+    
+    main { padding: 10px; overflow: visible; }
+    #scroll-container { overflow: visible; }
+    .scroller { position: static; }
 
-    /* Tabs (Segmented Control) */
-    .tabs-row {
-        display: flex; background: #0f172a; padding: 4px; border-radius: 12px;
-    }
-    .tab-btn {
-        flex: 1; padding: 10px; border: none; background: transparent;
-        color: var(--text-muted); font-weight: 600; font-size: 0.9rem;
-        border-radius: 8px; transition: 0.3s;
-    }
-    .tab-btn.active {
-        background: var(--accent); color: #0f172a; font-weight: 800; box-shadow: 0 2px 10px var(--accent-glow);
-    }
-
-    /* Messaggio Filtro */
-    #msgFiltro {
-        background: rgba(74, 222, 128, 0.1); color: var(--success);
-        padding: 8px; border-radius: 8px; text-align: center; font-size: 0.85rem; font-weight: 600;
-        border: 1px solid rgba(74, 222, 128, 0.2);
-    }
-
-    /* --- DATE HEADER (ACCORDION) --- */
-    .date-divider {
-        background: linear-gradient(90deg, #1e293b, #0f172a);
-        padding: 15px; margin: 15px 0 10px 0; border-radius: 12px;
-        color: var(--accent); font-weight: 700; letter-spacing: 1px;
-        display: flex; justify-content: space-between; align-items: center;
-        border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .date-divider::after { content: '▼'; font-size: 0.8rem; opacity: 0.7; transition: transform 0.3s; }
-    .date-divider.collapsed::after { transform: rotate(-90deg); }
-    .day-group.hidden { display: none; }
-
-    /* --- CARD SOSTITUZIONE (Il cuore del mobile) --- */
+    /* Card Mobile Style */
     .table-row {
         display: grid;
         grid-template-areas: 
@@ -221,37 +180,19 @@ footer { display: grid; grid-template-columns: 1fr 100px; gap: 15px; margin-top:
             "sostituto sostituto sostituto"
             "info info info";
         grid-template-columns: auto 1fr auto;
-        gap: 10px;
         background: #1e293b;
-        border: 1px solid var(--border);
         border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        align-items: center;
+        padding: 15px;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
     }
 
-    /* Layout interno della Card */
-    .data-ora { 
-        grid-area: ora; 
-        background: rgba(56, 189, 248, 0.1); color: var(--accent); 
-        padding: 5px 10px; border-radius: 8px; font-size: 0.9rem; font-weight: 800;
-    }
-    .data-classe { 
-        grid-area: classe; text-align: center; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
-    }
-    .data-aula { 
-        grid-area: aula; 
-        background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 8px;
-        font-size: 0.9rem; color: #fff;
-    }
-    
+    .data-ora { grid-area: ora; font-size: 0.9rem; background: rgba(56, 189, 248, 0.1); padding: 4px 8px; border-radius: 6px; }
+    .data-classe { grid-area: classe; color: var(--text-muted); }
+    .data-aula { grid-area: aula; font-size: 0.9rem; }
     .data-sostituto { 
-        grid-area: sostituto; 
-        font-size: 1.4rem; color: #fff; text-align: center; margin: 10px 0;
-        border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-        padding: 15px 0; letter-spacing: 0.5px;
+        grid-area: sostituto; font-size: 1.3rem; margin: 10px 0; 
+        padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
     }
-
-    .data-info { grid-area: info; display: flex; justify-content: center; }
+    .data-info { grid-area: info; }
 }
