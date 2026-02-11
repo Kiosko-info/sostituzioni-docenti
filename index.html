@@ -25,11 +25,25 @@
     </header>
 
     <main>
+        <div id="mobile-dashboard">
+            <div class="search-row">
+                <input type="text" id="cercaDocente" placeholder="🔍 Il tuo cognome..." onkeyup="filtraPerDocente()" >
+                <button id="btnSalvaNome" onclick="salvaPreferenza()" title="Salva come predefinito">💾</button>
+            </div>
+            <div class="tabs-row">
+                <button class="tab-btn active" onclick="cambiaModo('oggi')" id="btnOggi">OGGI</button>
+                <button class="tab-btn" onclick="cambiaModo('future')" id="btnFuture">PROGRAMMATE</button>
+            </div>
+            <div id="msgFiltro" style="display:none; color:var(--sostituto-green); font-size:0.8rem; text-align:center; margin-top:5px;">
+                Filtro attivo: <span id="nomeSalvato"></span>
+            </div>
+        </div>
+
         <div id="header-container" class="table-row table-header-fixed">
             <div class="col-ora">ORA</div>
             <div class="col-classe">CLASSE</div>
             <div class="col-aula">AULA</div>
-            <div class="col-sostituto header-align-left">SOSTITUTO</div>
+            <div class="col-sostituto">SOSTITUTO</div>
             <div class="col-info">INFO</div>
         </div>
         <div id="scroll-container">
@@ -48,11 +62,19 @@
                 <div id="fadeNews" class="fade-container"></div>
             </div>
         </div>
-        <div class="qr-footer-box">
-            <span style="font-size: 2rem;">📱</span>
-            <span>INFO ONLINE</span>
-        </div>
+        <div class="qr-footer-box"></div>
     </footer>
+
+    <div id="overlay-login">
+        <div class="login-box">
+            <h2>Area Riservata</h2>
+            <p style="margin-bottom:15px; color:#ccc;">Inserisci PIN</p>
+            <input type="password" id="inputPin" placeholder="****" maxlength="4">
+            <button onclick="verificaPin()">ACCEDI</button>
+            <p id="msgErrore" style="color:red; margin-top:10px; display:none;">PIN Errato</p>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
