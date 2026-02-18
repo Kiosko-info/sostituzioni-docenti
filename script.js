@@ -160,34 +160,36 @@ async function ricaricaDati() {
 
 function costruisciTabella(dati) {
     const scroller = document.getElementById('scroller-content');
-    if (!dati || dati.length === 0) {
-        scroller.innerHTML = "<div style='text-align:center; padding:50px; opacity:0.6;'>NESSUNA SOSTITUZIONE TROVATA</div>";
-        return;
-    }
-    
     dati.sort((a, b) => a.ora - b.ora);
+    
     let html = dati.map(riga => {
-        let tagHtml = "";
-        if (riga.compresenza === "SI") tagHtml = `<span class="tag tag-compresenza">COMPRESENZA</span>`;
-        else if (riga.doc_assente === "VIGILANZA RELIGIONE") tagHtml = `<span class="tag tag-vigilanza">VIGILANZA RELIGIONE</span>`;
+        // Verifichiamo se è compresenza (gestisce sia "SI" che il valore vero/falso)
+        const isCompresenza = riga.compresenza === "SI" || riga.compresenza === true;
+        // Verifichiamo se è vigilanza
+        const isVigilanza = riga.doc_assente === "VIGILANZA RELIGIONE";
 
         return `
-            <div class="table-row">
-                <div class="data-ora">${riga.ora}°</div>
-                <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
-                <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
-                <div class="data-sostituto">${String(riga.sostituto).toUpperCase()}</div>
-                <div class="data-info">${tagHtml}</div>
-            </div>`;
+        <div class="table-row">
+            <div class="data-ora">${riga.ora}°</div>
+            <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
+            <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
+            <div class="data-sostituto">
+                ${String(riga.sostituto).toUpperCase()}
+                ${isCompresenza ? '<br><span class="tag tag-compresenza" style="font-size:0.7rem; padding:2px 8px; margin-top:5px; display:inline-block;">COMPRESENZA</span>' : ''}
+            </div>
+            <div class="data-info">
+                ${isVigilanza ? '<span class="tag tag-vigilanza">VIGILANZA</span>' : ''}
+            </div>
+        </div>`;
     }).join('');
 
     if (window.innerWidth <= 768) {
         scroller.innerHTML = html;
         scroller.style.animation = "none";
     } else {
-        const separator = `<div class="table-row" style="height:120px; justify-content:center; opacity:0.4; grid-column: 1 / -1;">--- RICOMINCIA ELENCO ---</div>`;
-        scroller.innerHTML = html + separator + html + separator;
-        scroller.style.animation = `infiniteScroll ${Math.max(20, dati.length * 5)}s linear infinite`;
+        const sep = `<div class="table-row row-separator">--- RICOMINCIA ELENCO ---</div>`;
+        scroller.innerHTML = html + sep + html + sep;
+        scroller.style.animation = `infiniteScroll ${Math.max(20, dati.length * 6)}s linear infinite`;
     }
 }
 
@@ -198,4 +200,5 @@ function aggiornaDataOra() {
 function attivaFullScreen() { if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
 
 window.onload = init;
+
 
