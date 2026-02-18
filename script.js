@@ -2,36 +2,28 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxa-dWWpQVxE437Z0ECjvjYZqec57rG38jCP6UGDVz4NDmxLEnFL76F-If0-lCKDxefRw/exec"; 
 const PIN_SEGRETO = "1234"; 
 
-// VARIABILI GLOBALI (Essenziali per la rotazione)
+// VARIABILI GLOBALI
 let elencoNews = [];
 let meteoP1 = "", meteoP2 = "";
 let indiceNews = 0;
-let modoMeteoAttivo = "p1"; // Inizializzato per la rotazione
+let modoMeteoAttivo = "p1"; 
 
 function init() {
     checkLogin();
     aggiornaDataOra();
-    ricaricaDati(); // Carica le sostituzioni subito
+    ricaricaDati(); 
 
-    // --- AVVIO MOTORI SOLO SU MONITOR PC ---
     if (window.innerWidth > 768) {
-        caricaNewsRss(); // Scarica le news
-        aggiornaMeteo(); // Scarica il meteo
-
-        // 1. Fai girare le NEWS ogni 8 secondi (Intervallo fisso)
-        setInterval(ruotaNews, 8000);
-
-        // 2. Fai girare il METEO nel footer (Calcio d'inizio)
-        // Usiamo setTimeout perché poi la funzione si richiama da sola ogni 10s
-        setTimeout(ruotaCircolariMeteo, 5000); 
-
-        // 3. Aggiorna i dati meteo dal satellite ogni 30 minuti
-        setInterval(aggiornaMeteo, 1800000);
+        caricaNewsRss(); 
+        aggiornaMeteo();
+        
+        setInterval(ruotaNews, 8000);             
+        setTimeout(ruotaCircolariMeteo, 5000);    
+        setInterval(aggiornaMeteo, 1800000);      
     }
 
-    // --- MOTORI COMUNI (Sia PC che Mobile) ---
-    setInterval(aggiornaDataOra, 1000); // Orologio ogni secondo
-    setInterval(ricaricaDati, 60000);    // Sostituzioni ogni minuto
+    setInterval(aggiornaDataOra, 1000);
+    setInterval(ricaricaDati, 60000);
 }
 
 // --- FUNZIONI METEO ---
@@ -42,11 +34,9 @@ function getMeteoIcon(code) {
 
 async function aggiornaMeteo() {
     try {
-        // Coordinate Buccari/Marconi
         const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=39.2238&longitude=9.1217&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
         const data = await r.json();
         
-        // Update Header
         document.getElementById('meteoIcon').innerHTML = getMeteoIcon(data.current_weather.weathercode);
         document.getElementById('temp').innerText = Math.round(data.current_weather.temperature) + "°C";
         
@@ -70,7 +60,7 @@ async function aggiornaMeteo() {
     } catch(e) { console.error("Errore meteo:", e); }
 }
 
-// --- FUNZIONE NEWS (CORRETTA) ---
+// --- NEWS LOGIC ---
 async function caricaNewsRss() {
     const proxy = "https://corsproxy.io/?";
     const feeds = [{n:'Ansa', u:'https://www.ansa.it/sito/ansait_rss.xml'}];
@@ -101,7 +91,6 @@ function ruotaNews() {
     }
 }
 
-// --- ROTAZIONE METEO (LA TUA VECCHIA FUNZIONE) ---
 function ruotaCircolariMeteo() {
     const aC = document.getElementById('fadeCircolari');
     const labelC = document.getElementById('labelCircolari');
@@ -118,14 +107,70 @@ function ruotaCircolariMeteo() {
             aC.innerHTML = meteoP2 || "Caricamento..."; aC.classList.add('show');
             setTimeout(() => { modoMeteoAttivo = false; ruotaCircolariMeteo(); }, 10000);
         } else {
-            // Qui tornerebbe alle circolari se le avessi, altrimenti torna alla p1
             modoMeteoAttivo = "p1"; 
             ruotaCircolariMeteo();
         }
     }, 1000);
 }
 
-// --- GESTIONE DATI TABELLA & LOGIN ---
+// --- GESTIONE DATI & TABELLA ---
+async function ricaricaDati() {
+    const dot = document.getElementById('statusDot');
+    if(dot) dot.classList.add('dot-active');
+    try {
+        const oggi = new Date();
+        const isoData = oggi.getFullYear() + '-' + String(oggi.getMonth() + 1).padStart(2, '0') + '-' + String(oggi.getDate()).padStart(2, '0');
+        const url = `${SCRIPT_URL}?action=getSubstitutions&date=${isoData}`;
+        
+        const response = await fetch(url);
+        const dati = await response.json();
+        
+        const dataBella = oggi.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+        document.getElementById('giornoSostituzioni').innerText = `SITUAZIONE DEL ${dataBella}`;
+
+        costruisciTabella(dati);
+    } catch (e) { console.error("Errore caricamento:", e); }
+    finally { if(dot) setTimeout(() => dot.classList.remove('dot-active'), 1500); }
+}
+
+function costruisciTabella(dati) {
+    const scroller = document.getElementById('scroller-content');
+    if (!scroller) return;
+
+    dati.sort((a, b) => a.ora - b.ora);
+    
+    let html = dati.map(riga => {
+        const isCompresenza = riga.compresenza === "SI" || riga.compresenza === true;
+        const isVigilanza = riga.docente_assente === "VIGILANZA RELIGIONE";
+
+        return `
+        <div class="table-row">
+            <div class="data-ora">${riga.ora}°</div>
+            <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
+            <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
+            <div class="data-sostituto">
+                ${String(riga.sostituto).toUpperCase()}
+                ${isCompresenza ? '<br><span class="tag tag-compresenza" style="font-size:0.65rem; padding:2px 6px; margin-top:4px; display:inline-block; background: #f59e0b; color: #000; border-radius: 4px; font-weight: 800;">COMPRESENZA</span>' : ''}
+            </div>
+            <div class="data-info">
+                ${isVigilanza ? '<span class="tag tag-vigilanza">VIGILANZA</span>' : ''}
+            </div>
+        </div>`;
+    }).join('');
+
+    if (window.innerWidth <= 768) {
+        scroller.innerHTML = html || '<div style="padding:20px; text-align:center;">Nessuna sostituzione per oggi</div>';
+        scroller.style.animation = "none";
+        scroller.style.position = "relative";
+        scroller.style.top = "0";
+    } else {
+        const sep = `<div class="table-row row-separator">--- RICOMINCIA ELENCO ---</div>`;
+        scroller.innerHTML = html + sep + html + sep;
+        scroller.style.animation = `infiniteScroll ${Math.max(20, dati.length * 6)}s linear infinite`;
+    }
+}
+
+// --- LOGIN E UTILITY ---
 function checkLogin() {
     if (window.innerWidth > 768) return;
     if (sessionStorage.getItem("monitor_logged") !== "true") {
@@ -142,64 +187,19 @@ function verificaPin() {
     }
 }
 
-async function ricaricaDati() {
-    const dot = document.getElementById('statusDot');
-    if(dot) dot.classList.add('dot-active');
-    try {
-        const url = `${SCRIPT_URL}?action=getSubstitutions&date=${new Date().toISOString().split('T')[0]}`;
-        const response = await fetch(url);
-        const dati = await response.json();
-        
-        const dataBella = new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
-        document.getElementById('giornoSostituzioni').innerText = `SITUAZIONE DEL ${dataBella}`;
-
-        costruisciTabella(dati);
-    } catch (e) { console.error("Errore caricamento:", e); }
-    finally { if(dot) setTimeout(() => dot.classList.remove('dot-active'), 1500); }
-}
-
-function costruisciTabella(dati) {
-    const scroller = document.getElementById('scroller-content');
-    dati.sort((a, b) => a.ora - b.ora);
-    
-    let html = dati.map(riga => {
-        // Verifichiamo se è compresenza (gestisce sia "SI" che il valore vero/falso)
-        const isCompresenza = riga.compresenza === "SI" || riga.compresenza === true;
-        // Verifichiamo se è vigilanza
-        const isVigilanza = riga.docente_assente === "VIGILANZA RELIGIONE";
-
-        return `
-        <div class="table-row">
-            <div class="data-ora">${riga.ora}°</div>
-            <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
-            <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
-            <div class="data-sostituto">
-                ${String(riga.sostituto).toUpperCase()}
-                ${isCompresenza ? '<br><span class="tag tag-compresenza" style="font-size:0.7rem; padding:2px 8px; margin-top:5px; display:inline-block;">COMPRESENZA</span>' : ''}
-            </div>
-            <div class="data-info">
-                ${isVigilanza ? '<span class="tag tag-vigilanza">VIGILANZA</span>' : ''}
-            </div>
-        </div>`;
-    }).join('');
-
-    if (window.innerWidth <= 768) {
-        scroller.innerHTML = html;
-        scroller.style.animation = "none";
-    } else {
-        const sep = `<div class="table-row row-separator">--- RICOMINCIA ELENCO ---</div>`;
-        scroller.innerHTML = html + sep + html + sep;
-        scroller.style.animation = `infiniteScroll ${Math.max(20, dati.length * 6)}s linear infinite`;
-    }
-}
-
 function aggiornaDataOra() {
     const now = new Date();
     document.getElementById('dataOra').innerHTML = now.toLocaleDateString('it-IT', {weekday:'short', day:'2-digit', month:'short'}).toUpperCase() + " | " + now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
 }
-function attivaFullScreen() { if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+
+function attivaFullScreen() { 
+    if(window.innerWidth > 768 && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen(); 
+    }
+}
 
 window.onload = init;
+
 
 
 
