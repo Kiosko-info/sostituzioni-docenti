@@ -166,7 +166,7 @@ function costruisciTabella(dati) {
         // Verifichiamo se è compresenza (gestisce sia "SI" che il valore vero/falso)
         const isCompresenza = riga.compresenza === "SI" || riga.compresenza === true;
         // Verifichiamo se è vigilanza
-        const isVigilanza = riga.doc_assente === "VIGILANZA RELIGIONE";
+        const isVigilanza = riga.docente_assente === "VIGILANZA RELIGIONE";
 
         return `
         <div class="table-row">
@@ -200,5 +200,6 @@ function aggiornaDataOra() {
 function attivaFullScreen() { if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
 
 window.onload = init;
+
 
 
