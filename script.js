@@ -9,6 +9,11 @@ let indiceNews = 0;
 let modoMeteoAttivo = "p1"; 
 
 function init() {
+    // Registrazione Service Worker per PWA (Essenziale per l'icona)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(err => console.error("SW Errore:", err));
+    }
+
     checkLogin();
     aggiornaDataOra();
     ricaricaDati(); 
