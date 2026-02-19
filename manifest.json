@@ -1,0 +1,22 @@
+{
+  "name": "Logbook Buccari Marconi",
+  "short_name": "Logbook",
+  "description": "Monitor Sostituzioni Live - IIS Buccari Marconi",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icona.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icona.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
