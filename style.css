@@ -48,9 +48,7 @@ body {
 }
 
 .login-icon { font-size: 3rem; margin-bottom: 15px; }
-
 .login-box h2 { margin-bottom: 10px; font-weight: 800; color: #fff; }
-
 .login-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; }
 
 .login-box input {
@@ -97,6 +95,7 @@ header {
     z-index: 10;
 }
 
+.logo-scuola { font-weight: 900; letter-spacing: -1px; line-height: 1; color: var(--accent); font-size: 1.2rem; }
 .main-title {
     font-size: 1.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
     background: linear-gradient(to right, #fff, var(--accent));
@@ -104,7 +103,6 @@ header {
 }
 
 .sub-title { font-size: 0.9rem; color: var(--accent); font-weight: 600; text-align: center; }
-
 .info-destra { justify-self: end; display: flex; gap: 15px; align-items: center; }
 
 #statusDot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; opacity: 0; }
@@ -145,6 +143,21 @@ main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding
 .data-ora { color: var(--accent); font-weight: 700; }
 .data-sostituto { color: var(--success); font-weight: 800; }
 
+/* REINSERITA CENTRATURA SEPARATORE */
+.row-separator {
+    display: flex !important; 
+    justify-content: center; 
+    align-items: center;
+    height: 120px; 
+    font-weight: 900; 
+    letter-spacing: 5px; 
+    color: var(--accent);
+    opacity: 0.5; 
+    font-size: 1.2rem; 
+    text-transform: uppercase;
+}
+
+/* TAGS */
 .tag {
     font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: 800;
     text-transform: uppercase; display: inline-block;
@@ -154,7 +167,7 @@ main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding
 
 @keyframes infiniteScroll { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 
-/* --- FOOTER --- */
+/* --- FOOTER & TICKERS --- */
 footer { display: grid; grid-template-columns: 1fr 100px; gap: 15px; padding: 20px; }
 .footer-tickers { display: flex; flex-direction: column; gap: 10px; }
 .ticker-row { background: rgba(15, 23, 42, 0.8); border-radius: 10px; height: 50px; display: flex; align-items: center; overflow: hidden; }
@@ -163,12 +176,21 @@ footer { display: grid; grid-template-columns: 1fr 100px; gap: 15px; padding: 20
 .show { opacity: 1; }
 .qr-footer-box { background: white url('qr-code.png') center/80% no-repeat; border-radius: 10px; }
 
+/* REINSERITI STILI METEO */
+.meteo-settimana { display: flex; gap: 20px; width: 100%; justify-content: space-around; align-items: center; }
+.meteo-giorno { text-align: center; line-height: 1.2; }
+.m-header { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; display: flex; gap: 4px; justify-content: center; }
+.m-icon { font-size: 1.2rem; margin: 2px 0; }
+.m-temps { font-size: 0.8rem; font-weight: 700; display: flex; gap: 6px; justify-content: center; }
+.temp-max { color: #f43f5e; }
+.temp-min { color: #38bdf8; }
+
 /* --- RESPONSIVE MOBILE OTTIMIZZATO --- */
 @media screen and (max-width: 768px) {
     body { 
         height: auto; 
         overflow-y: auto; 
-        background-attachment: scroll !important; /* Disattiva fixed background pesante su Safari iOS */
+        background-attachment: scroll !important;
     }
     
     #overlay-login {
