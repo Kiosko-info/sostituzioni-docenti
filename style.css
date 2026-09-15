@@ -29,6 +29,7 @@ body {
     inset: 0;
     background: rgba(2, 6, 23, 0.95);
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -91,6 +92,7 @@ header {
     padding: 15px 30px;
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     z-index: 10;
 }
@@ -161,15 +163,34 @@ footer { display: grid; grid-template-columns: 1fr 100px; gap: 15px; padding: 20
 .show { opacity: 1; }
 .qr-footer-box { background: white url('qr-code.png') center/80% no-repeat; border-radius: 10px; }
 
-/* --- RESPONSIVE MOBILE --- */
+/* --- RESPONSIVE MOBILE OTTIMIZZATO --- */
 @media screen and (max-width: 768px) {
-    body { height: auto; overflow-y: auto; }
+    body { 
+        height: auto; 
+        overflow-y: auto; 
+        background-attachment: scroll !important; /* Disattiva fixed background pesante su Safari iOS */
+    }
     
-    header { grid-template-columns: 1fr; padding: 15px; position: sticky; top: 0; }
+    #overlay-login {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(2, 6, 23, 0.98);
+    }
+
+    header { 
+        grid-template-columns: 1fr; 
+        padding: 15px; 
+        position: sticky; 
+        top: 0; 
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(15, 23, 42, 0.98);
+    }
+    
     .info-destra, footer, .table-header-fixed { display: none !important; }
     
     main { padding: 10px; overflow: visible; }
-    #scroll-container { overflow: visible; }
+    #scroll-container { overflow: visible; background: transparent; }
     .scroller { position: static; }
 
     /* Card Mobile Style */
