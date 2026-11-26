@@ -1,6 +1,6 @@
-/* --- CONFIGURAZIONE VARIABILI --- */
+/* --- APP MODERN DARK - PREMIUM DESIGN --- */
 :root {
-    --bg-dark: #0f172a;
+    --bg-dark: #020617;
     --card-bg: rgba(30, 41, 59, 0.7);
     --accent: #38bdf8;
     --accent-glow: rgba(56, 189, 248, 0.3);
@@ -10,11 +10,11 @@
     --border: rgba(255, 255, 255, 0.1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: linear-gradient(135deg, #020617 0%, #1e293b 100%);
+    background: radial-gradient(circle at top right, #1e293b, #020617);
     background-attachment: fixed;
     height: 100vh;
     display: flex;
@@ -23,219 +23,137 @@ body {
     overflow: hidden;
 }
 
-/* --- OVERLAY LOGIN (Stile Moderno) --- */
-#overlay-login {
-    position: fixed;
-    inset: 0;
-    background: rgba(2, 6, 23, 0.95);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.login-box {
-    background: #1e293b;
-    padding: 40px 30px;
-    border-radius: 24px;
-    border: 1px solid var(--accent);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px var(--accent-glow);
-    text-align: center;
-    width: 90%;
-    max-width: 380px;
-}
-
-.login-icon { font-size: 3rem; margin-bottom: 15px; }
-.login-box h2 { margin-bottom: 10px; font-weight: 800; color: #fff; }
-.login-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; }
-
-.login-box input {
-    width: 100%;
-    background: #0f172a;
-    border: 1px solid var(--border);
-    padding: 15px;
-    border-radius: 12px;
-    color: white;
-    font-size: 1.5rem;
-    text-align: center;
-    letter-spacing: 5px;
-    margin-bottom: 20px;
-    outline: none;
-}
-
-.login-box input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
-
-.login-box button {
-    width: 100%;
-    background: var(--accent);
-    color: #0f172a;
-    font-weight: 800;
-    padding: 15px;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.login-box button:active { transform: scale(0.98); }
-
-/* --- HEADER --- */
+/* --- HEADER PREMIUM --- */
 header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 15px 30px;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    padding: 20px 40px;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(25px);
     border-bottom: 1px solid var(--border);
-    z-index: 10;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    z-index: 100;
 }
 
 .logo-scuola { font-weight: 900; letter-spacing: -1px; line-height: 1; color: var(--accent); font-size: 1.2rem; }
 .main-title {
-    font-size: 1.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
-    background: linear-gradient(to right, #fff, var(--accent));
+    font-size: 2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 3px;
+    background: linear-gradient(to bottom, #fff 40%, var(--accent));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
+.sub-title { font-size: 1rem; color: var(--accent); font-weight: 700; margin-top: 5px; text-align: center; }
 
-.sub-title { font-size: 0.9rem; color: var(--accent); font-weight: 600; text-align: center; }
-.info-destra { justify-self: end; display: flex; gap: 15px; align-items: center; }
+.info-destra { justify-self: end; display: flex; gap: 20px; align-items: center; font-weight: 700; }
+#statusDot { width: 12px; height: 12px; background: var(--success); border-radius: 50%; opacity: 0; transition: 0.5s; }
+.dot-active { opacity: 1 !important; box-shadow: 0 0 15px var(--success); }
 
-#statusDot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; opacity: 0; }
-.dot-active { opacity: 1 !important; box-shadow: 0 0 10px #22c55e; }
-
-/* --- MAIN & TABLE --- */
-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 20px; }
+/* --- TABELLA E SCROLLER --- */
+main { flex: 1; display: flex; flex-direction: column; padding: 25px; overflow: hidden; }
 
 .table-header-fixed {
     display: grid;
-    grid-template-columns: 0.8fr 1fr 1fr 3fr 1.5fr;
-    padding: 15px;
-    background: rgba(2, 6, 23, 0.8);
-    border-radius: 12px 12px 0 0;
-    font-weight: 800; color: var(--accent);
+    grid-template-columns: 0.7fr 0.9fr 1.1fr 2.2fr 2.2fr 1.4fr;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 16px 16px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--accent);
+    font-weight: 900; color: var(--accent); letter-spacing: 1px;
 }
-
-.table-header-fixed div { text-align: center; font-size: 0.8rem; letter-spacing: 1px; }
+.table-header-fixed div { text-align: center; }
 
 #scroll-container {
     flex: 1; overflow: hidden; position: relative;
     background: rgba(15, 23, 42, 0.4);
-    border-radius: 0 0 12px 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
 }
 
 .scroller { position: absolute; width: 100%; will-change: transform; }
 
 .table-row {
     display: grid;
-    grid-template-columns: 0.8fr 1fr 1fr 3fr 1.5fr;
-    padding: 18px 10px;
+    grid-template-columns: 0.7fr 0.9fr 1.1fr 2.2fr 2.2fr 1.4fr;
+    padding: 22px 20px;
     align-items: center;
     border-bottom: 1px solid var(--border);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+    transition: background 0.3s;
 }
+.table-row div { text-align: center; font-weight: 600; }
+.data-ora { color: var(--accent); font-weight: 800; }
+.data-sostituto { color: var(--success); font-weight: 900; text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); }
 
-.table-row div { text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.data-ora { color: var(--accent); font-weight: 700; }
-.data-sostituto { color: var(--success); font-weight: 800; }
-
-/* REINSERITA CENTRATURA SEPARATORE */
+/* Centratura Separatore */
 .row-separator {
-    display: flex !important; 
-    justify-content: center; 
-    align-items: center;
-    height: 120px; 
-    font-weight: 900; 
-    letter-spacing: 5px; 
-    color: var(--accent);
-    opacity: 0.5; 
-    font-size: 1.2rem; 
-    text-transform: uppercase;
+    display: flex !important; justify-content: center; align-items: center;
+    height: 120px; font-weight: 900; letter-spacing: 5px; color: var(--accent);
+    opacity: 0.5; font-size: 1.2rem; text-transform: uppercase;
 }
 
-/* TAGS */
-.tag {
-    font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: 800;
-    text-transform: uppercase; display: inline-block;
-}
-.tag-compresenza { background: var(--accent); color: #000; }
+/* Tag */
+.tag { font-size: 0.8rem; padding: 5px 12px; border-radius: 8px; font-weight: 900; }
+.tag-compresenza { background: var(--accent); color: #020617; }
 .tag-vigilanza { background: #a855f7; color: #fff; }
 
 @keyframes infiniteScroll { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 
-/* --- FOOTER & TICKERS --- */
-footer { display: grid; grid-template-columns: 1fr 100px; gap: 15px; padding: 20px; }
-.footer-tickers { display: flex; flex-direction: column; gap: 10px; }
-.ticker-row { background: rgba(15, 23, 42, 0.8); border-radius: 10px; height: 50px; display: flex; align-items: center; overflow: hidden; }
-.ticker-label { padding: 0 15px; font-weight: 800; font-size: 0.75rem; height: 100%; display: flex; align-items: center; min-width: 160px; color: #fff; }
-.fade-container { padding-left: 15px; font-size: 1.1rem; opacity: 0; transition: 1s; flex: 1; }
+/* --- FOOTER E TICKERS --- */
+footer { display: grid; grid-template-columns: 1fr 120px; gap: 20px; padding: 0 25px 25px 25px; }
+.ticker-row { 
+    background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border); 
+    border-radius: 12px; height: 60px; display: flex; align-items: center; 
+    overflow: hidden; margin-bottom: 10px;
+}
+.ticker-label { 
+    padding: 0 25px; font-weight: 900; font-size: 0.8rem; height: 100%; 
+    display: flex; align-items: center; min-width: 200px; text-transform: uppercase;
+}
+.fade-container { padding: 0 25px; font-size: 1.2rem; opacity: 0; transition: 1s; font-weight: 600; flex: 1; }
 .show { opacity: 1; }
-.qr-footer-box { background: white url('qr-code.png') center/80% no-repeat; border-radius: 10px; }
 
-/* REINSERITI STILI METEO */
-.meteo-settimana { display: flex; gap: 20px; width: 100%; justify-content: space-around; align-items: center; }
+.meteo-settimana { display: flex; gap: 20px; width: 100%; justify-content: space-around; }
 .meteo-giorno { text-align: center; line-height: 1.2; }
-.m-header { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; display: flex; gap: 4px; justify-content: center; }
-.m-icon { font-size: 1.2rem; margin: 2px 0; }
-.m-temps { font-size: 0.8rem; font-weight: 700; display: flex; gap: 6px; justify-content: center; }
-.temp-max { color: #f43f5e; }
-.temp-min { color: #38bdf8; }
+.m-header { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; }
 
-/* --- RESPONSIVE MOBILE OTTIMIZZATO --- */
-@media screen and (max-width: 768px) {
-    body { 
-        height: auto; 
-        overflow-y: auto; 
-        background-attachment: scroll !important;
-    }
+.qr-footer-box { 
+    background-color: white;
+    /* 'contain' assicura che il QR non venga mai tagliato */
+    background-image: url('qr-code.png'); 
+    background-position: center;
+    background-size: contain; 
+    background-repeat: no-repeat;
     
-    #overlay-login {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        background: rgba(2, 6, 23, 0.98);
-    }
+    border-radius: 12px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-end; /* Spinge il testo in basso */
+    padding-bottom: 5px; /* Crea un po' di spazio per il testo */
+    color: #020617; 
+    font-weight: 900; 
+    font-size: 0.65rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
 
-    header { 
-        grid-template-columns: 1fr; 
-        padding: 15px; 
-        position: sticky; 
-        top: 0; 
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        background: rgba(15, 23, 42, 0.98);
-    }
-    
-    .info-destra, footer, .table-header-fixed { display: none !important; }
-    
-    main { padding: 10px; overflow: visible; }
-    #scroll-container { overflow: visible; background: transparent; }
-    .scroller { position: static; }
-
-    /* Card Mobile Style */
-    .table-row {
-        display: grid;
-        grid-template-areas: 
-            "ora classe aula"
-            "sostituto sostituto sostituto"
-            "info info info";
-        grid-template-columns: auto 1fr auto;
-        background: #1e293b;
-        border-radius: 16px;
-        padding: 15px;
-        margin-bottom: 10px;
-        font-size: 1.1rem;
-    }
-
-    .data-ora { grid-area: ora; font-size: 0.9rem; background: rgba(56, 189, 248, 0.1); padding: 4px 8px; border-radius: 6px; }
-    .data-classe { grid-area: classe; color: var(--text-muted); }
-    .data-aula { grid-area: aula; font-size: 0.9rem; }
-    .data-sostituto { 
-        grid-area: sostituto; font-size: 1.3rem; margin: 10px 0; 
-        padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    }
-    .data-info { grid-area: info; }
+/* --- LOGIN --- */
+#overlay-login {
+    position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
+    backdrop-filter: blur(20px); z-index: 1000; display: flex; justify-content: center; align-items: center;
+}
+.login-box {
+    background: #1e293b; padding: 50px; border-radius: 30px; border: 1px solid var(--accent);
+    box-shadow: 0 0 50px var(--accent-glow); text-align: center;
+}
+.login-box input {
+    background: #020617; border: 1px solid var(--border); color: #fff; padding: 20px;
+    font-size: 2rem; border-radius: 15px; width: 100%; text-align: center; margin: 25px 0; outline: none;
+}
+.data-assente { 
+    color: var(--text-muted); 
+    font-weight: 700; 
 }
