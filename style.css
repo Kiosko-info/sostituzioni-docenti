@@ -85,6 +85,7 @@ main { flex: 1; display: flex; flex-direction: column; padding: 25px; overflow: 
 }
 .table-row div { text-align: center; font-weight: 600; }
 .data-ora { color: var(--accent); font-weight: 800; }
+.data-assente { color: var(--text-muted); font-weight: 700; }
 .data-sostituto { color: var(--success); font-weight: 900; text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); }
 
 /* Centratura Separatore */
@@ -95,7 +96,7 @@ main { flex: 1; display: flex; flex-direction: column; padding: 25px; overflow: 
 }
 
 /* Tag */
-.tag { font-size: 0.8rem; padding: 5px 12px; border-radius: 8px; font-weight: 900; }
+.tag { font-size: 0.8rem; padding: 5px 12px; border-radius: 8px; font-weight: 900; display: inline-block; }
 .tag-compresenza { background: var(--accent); color: #020617; }
 .tag-vigilanza { background: #a855f7; color: #fff; }
 
@@ -121,18 +122,16 @@ footer { display: grid; grid-template-columns: 1fr 120px; gap: 20px; padding: 0 
 
 .qr-footer-box { 
     background-color: white;
-    /* 'contain' assicura che il QR non venga mai tagliato */
     background-image: url('qr-code.png'); 
     background-position: center;
     background-size: contain; 
     background-repeat: no-repeat;
-    
     border-radius: 12px; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    justify-content: flex-end; /* Spinge il testo in basso */
-    padding-bottom: 5px; /* Crea un po' di spazio per il testo */
+    justify-content: flex-end;
+    padding-bottom: 5px;
     color: #020617; 
     font-weight: 900; 
     font-size: 0.65rem;
@@ -144,16 +143,134 @@ footer { display: grid; grid-template-columns: 1fr 120px; gap: 20px; padding: 0 
 #overlay-login {
     position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
     backdrop-filter: blur(20px); z-index: 1000; display: flex; justify-content: center; align-items: center;
+    padding: 20px;
 }
 .login-box {
-    background: #1e293b; padding: 50px; border-radius: 30px; border: 1px solid var(--accent);
-    box-shadow: 0 0 50px var(--accent-glow); text-align: center;
+    background: #1e293b; padding: 40px 25px; border-radius: 30px; border: 1px solid var(--accent);
+    box-shadow: 0 0 50px var(--accent-glow); text-align: center; width: 100%; max-width: 400px;
 }
+.login-icon { font-size: 2.5rem; margin-bottom: 10px; }
 .login-box input {
-    background: #020617; border: 1px solid var(--border); color: #fff; padding: 20px;
-    font-size: 2rem; border-radius: 15px; width: 100%; text-align: center; margin: 25px 0; outline: none;
+    background: #020617; border: 1px solid var(--border); color: #fff; padding: 16px;
+    font-size: 1.8rem; border-radius: 15px; width: 100%; text-align: center; margin: 20px 0; outline: none;
 }
-.data-assente { 
-    color: var(--text-muted); 
-    font-weight: 700; 
+.login-box button {
+    background: var(--accent); color: #020617; border: none; padding: 16px;
+    font-size: 1.1rem; font-weight: 900; border-radius: 15px; width: 100%; cursor: pointer;
+}
+
+/* --- LAYOUT MOBILE (SMARTPHONE E TABLET VERTICALI) --- */
+@media (max-width: 900px) {
+    body { 
+        height: auto; 
+        min-height: 100vh; 
+        overflow-y: auto; 
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    header { 
+        grid-template-columns: 1fr; 
+        text-align: center; 
+        gap: 6px; 
+        padding: 14px 15px; 
+        position: sticky;
+        top: 0;
+    }
+    .logo-scuola { font-size: 0.85rem; letter-spacing: 1px; }
+    .logo-scuola br { display: none; }
+    .main-title { font-size: 1.35rem; letter-spacing: 1.5px; }
+    .sub-title { font-size: 0.8rem; margin-top: 2px; }
+    .info-destra { justify-self: center; font-size: 0.8rem; gap: 10px; }
+    
+    /* Nasconde completamente meteo e footer (circolari/news/QR) */
+    .meteo-box, footer { display: none !important; }
+
+    main { padding: 12px; overflow: visible; }
+    .table-header-fixed { display: none !important; }
+
+    /* Scorrimento manuale con il dito */
+    #scroll-container { 
+        overflow: visible; 
+        background: transparent; 
+        border: none; 
+        backdrop-filter: none;
+    }
+    .scroller { 
+        position: static !important; 
+        transform: none !important;
+        animation: none !important; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 12px; 
+    }
+
+    /* Card mobile */
+    .table-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        padding: 14px 16px;
+        background: rgba(15, 23, 42, 0.88);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--accent);
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* 1. Riquadri superiori: ORA - CLASSE - AULA */
+    .data-ora, .data-classe, .data-aula {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+    .data-classe::before { content: "CL. "; font-size: 0.7rem; color: var(--text-muted); font-weight: 800; }
+    .data-aula::before { content: "AULA "; font-size: 0.7rem; color: var(--text-muted); font-weight: 800; }
+
+    /* 2. Docente Assente: più piccolo, in grigio, sopra al sostituto */
+    .data-assente {
+        grid-column: 1 / -1;
+        text-align: left !important;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding-left: 4px;
+        margin-top: 2px;
+    }
+    .data-assente:empty { display: none; }
+    .data-assente::before {
+        content: "ASSENTE: ";
+        font-size: 0.7rem;
+        font-weight: 800;
+        opacity: 0.8;
+    }
+
+    /* 3. Sostituto: più grande, in verde, subito sotto all'assente */
+    .data-sostituto {
+        grid-column: 1 / -1;
+        text-align: left !important;
+        color: var(--success);
+        font-size: 1.2rem;
+        font-weight: 900;
+        padding-left: 4px;
+        line-height: 1.2;
+    }
+    .data-sostituto::before {
+        content: "SOSTITUTO: ";
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        display: block;
+        margin-bottom: 1px;
+    }
+
+    /* 4. Info (Vigilanza o Disposizione/Compresenza) */
+    .data-info {
+        grid-column: 1 / -1;
+        text-align: left !important;
+        padding-left: 4px;
+        margin-top: 4px;
+    }
+    .data-info:empty { display: none; }
 }

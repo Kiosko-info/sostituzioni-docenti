@@ -7,19 +7,23 @@ let meteoP1 = "", meteoP2 = "";
 let indiceNews = 0;
 let modoMeteoAttivo = "p1"; 
 
+function isDispositivoMobile() {
+    return window.innerWidth <= 900 || ('ontouchstart' in window && window.innerWidth < 1100);
+}
+
 function init() {
     checkLogin();
     aggiornaDataOra();
     ricaricaDati(); 
 
-    if (window.innerWidth > 768) {
+    // Meteo, News e Circolari vengono caricati SOLO su monitor desktop
+    if (!isDispositivoMobile()) {
         caricaNewsRss(); 
         aggiornaMeteo();
         
-        // INTERVALLI SETTATI CORRETTAMENTE
-        setInterval(ruotaNews, 8000);             // News ogni 8 secondi
-        setTimeout(ruotaCircolariMeteo, 5000);    // Start Meteo differito
-        setInterval(aggiornaMeteo, 1800000);      // Dati meteo ogni 30 min
+        setInterval(ruotaNews, 8000);
+        setTimeout(ruotaCircolariMeteo, 5000);
+        setInterval(aggiornaMeteo, 1800000);
     }
 
     setInterval(aggiornaDataOra, 1000);
@@ -57,7 +61,7 @@ function ruotaNews() {
     }
 }
 
-// --- METEO LOGIC (RICORSIVA) ---
+// --- METEO LOGIC ---
 function getMeteoIcon(code) { 
     const icone = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 48: "🌫️", 51: "🌦️", 61: "🌧️", 63: "🌧️", 71: "🌨️", 80: "🌦️", 95: "⛈️" }; 
     return icone[code] || "☀️"; 
@@ -65,7 +69,7 @@ function getMeteoIcon(code) {
 
 async function aggiornaMeteo() {
     try {
-        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=41.90&longitude=12.49&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=39.22&longitude=9.12&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
         const data = await r.json();
         document.getElementById('meteoIcon').innerHTML = getMeteoIcon(data.current_weather.weathercode);
         document.getElementById('temp').innerText = Math.round(data.current_weather.temperature) + "°C";
@@ -123,19 +127,27 @@ function costruisciTabella(dati) {
     let html = dati.map(riga => {
         const assente = String(riga.docente_assente || "").toUpperCase();
         const isVigilanza = assente === "VIGILANZA RELIGIONE";
+        const isDisposizione = riga.compresenza === "SI";
+        
+        let badgeInfo = "";
+        if (isDisposizione) {
+            badgeInfo = '<span class="tag tag-compresenza">DISPOSIZIONE / COMPRESENZA</span>';
+        } else if (isVigilanza) {
+            badgeInfo = '<span class="tag tag-vigilanza">VIGILANZA</span>';
+        }
         
         return `
         <div class="table-row">
-            <div class="data-ora">${riga.ora}°</div>
+            <div class="data-ora">${riga.ora}° ORA</div>
             <div class="data-classe">${String(riga.classe).toUpperCase()}</div>
             <div class="data-aula">${String(riga.aula).toUpperCase()}</div>
             <div class="data-assente">${isVigilanza ? "" : assente}</div>
             <div class="data-sostituto">${String(riga.sostituto || "").toUpperCase()}</div>
-            <div class="data-info">${riga.compresenza === "SI" ? '<span class="tag tag-compresenza">COMPRESENZA</span>' : (isVigilanza ? '<span class="tag tag-vigilanza">VIGILANZA</span>' : '')}</div>
+            <div class="data-info">${badgeInfo}</div>
         </div>`;
     }).join('');
 
-    if (window.innerWidth <= 768) {
+    if (isDispositivoMobile()) {
         scroller.innerHTML = html;
         scroller.style.animation = "none";
     } else {
@@ -147,7 +159,7 @@ function costruisciTabella(dati) {
 
 // --- STANDARD ---
 function checkLogin() {
-    if (window.innerWidth > 768) return;
+    if (!isDispositivoMobile()) return;
     if (sessionStorage.getItem("monitor_logged") !== "true") document.getElementById('overlay-login').style.display = "flex";
 }
 function verificaPin() {
@@ -160,5 +172,9 @@ function aggiornaDataOra() {
     const now = new Date();
     document.getElementById('dataOra').innerHTML = now.toLocaleDateString('it-IT', {weekday:'short', day:'2-digit', month:'short'}).toUpperCase() + " | " + now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
 }
-function attivaFullScreen() { if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+function attivaFullScreen() { 
+    if(!isDispositivoMobile() && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {}); 
+    }
+}
 window.onload = init;
