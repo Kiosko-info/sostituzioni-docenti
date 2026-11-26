@@ -33,7 +33,7 @@ function init() {
 // --- NEWS LOGIC ---
 async function caricaNewsRss() {
     const proxy = "https://corsproxy.io/?";
-    const feeds = [{n:'Ansa', u:'https://www.ansa.it/sito/ansait_rss.xml'}];
+    const feeds = [{n:'ilsole24ore', u:'https://www.ilsole24ore.com/rss/italia.xml'}];
     elencoNews = [];
     for(let f of feeds) {
         try {
